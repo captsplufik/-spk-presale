@@ -1,154 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SPK Token Presale</title>
-  <link rel="stylesheet" href="style.css" />
-  <script type="module" src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SPK Token Presale - Connect Wallet</title>
+<style>
+  /* Minimal CSS for the button & page */
+  :root {
+    --primary: #6c5ce7;
+    --primary-dark: #5649c0;
+    --dark: #2d3436;
+    --light: #f5f6fa;
+    --success: #00b894;
+  }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--light);
+    color: var(--dark);
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+  }
+  .btn {
+    padding: 12px 25px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    background-color: var(--primary);
+    color: white;
+    transition: background-color 0.3s ease;
+  }
+  .btn:hover {
+    background-color: var(--primary-dark);
+  }
+</style>
 </head>
 <body>
-  <!-- Navigation -->
-  <nav class="navbar">
-    <div class="container">
-      <a href="#" class="logo">SPLU<span>FIK</span></a>
-      <div class="nav-links">
-        <a href="#about">About</a>
-        <a href="#tokenomics">Tokenomics</a>
-        <a href="#roadmap">Roadmap</a>
-        <a href="#newsletter">Newsletter</a>
-      </div>
-      <div class="hamburger">&#9776;</div>
-    </div>
-  </nav>
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="container">
-      <div class="hero-content">
-        <h1>Join the <span>SPK Token</span> Presale</h1>
-        <p>Buy SPK at just 0.05 TON before we list on major exchanges. Be part of the Splufik revolution on the TON blockchain!</p>
-        <div class="cta-buttons">
-          <ton-connect style="--ton-connect-button-color: #6c5ce7;"></ton-connect>
-        </div>
-      </div>
-      <div class="hero-image">
-        <img src="https://cryptologos.cc/logos/ton-crystal-ton-logo.png?v=032" alt="SPK Token" />
-      </div>
-    </div>
-  </section>
+<button id="connect-wallet" class="btn">Connect Wallet</button>
 
-  <!-- Tokenomics -->
-  <section id="tokenomics" class="features">
-    <div class="container">
-      <h2>Tokenomics</h2>
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="icon">💰</div>
-          <h3>Total Supply</h3>
-          <p>1,000,000,000 SPK</p>
-        </div>
-        <div class="feature-card">
-          <div class="icon">🔥</div>
-          <h3>Presale</h3>
-          <p>500,000,000 SPK at 0.05 TON each</p>
-        </div>
-        <div class="feature-card">
-          <div class="icon">🔒</div>
-          <h3>Liquidity & Lock</h3>
-          <p>30% will be locked for DEX liquidity</p>
-        </div>
-        <div class="feature-card">
-          <div class="icon">🚀</div>
-          <h3>Marketing & Rewards</h3>
-          <p>20% reserved for community incentives</p>
-        </div>
-      </div>
-    </div>
-  </section>
+<script type="module">
+  import { TonConnect } from "https://cdn.jsdelivr.net/npm/@tonconnect/sdk@0.20.7/dist/tonconnect.sdk.es.js";
 
-  <!-- About -->
-  <section id="about" class="market-overview">
-    <div class="container">
-      <h2>About SPK</h2>
-      <p style="text-align: center; max-width: 800px; margin: 0 auto;">
-        SPK (Splufik) is a community-driven token built on the TON blockchain, offering DeFi features, staking, and real-world utility.
-        Be part of the movement and enjoy early benefits by joining our presale now!
-      </p>
-    </div>
-  </section>
+  const connectBtn = document.getElementById("connect-wallet");
 
-  <!-- Roadmap -->
-  <section id="roadmap" class="features">
-    <div class="container">
-      <h2>Roadmap</h2>
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="icon">✅</div>
-          <h3>Q2 2025</h3>
-          <p>Token creation, presale launch, Telegram Mini App</p>
-        </div>
-        <div class="feature-card">
-          <div class="icon">🛠️</div>
-          <h3>Q3 2025</h3>
-          <p>DEX listing, liquidity lock, influencer marketing</p>
-        </div>
-        <div class="feature-card">
-          <div class="icon">📈</div>
-          <h3>Q4 2025</h3>
-          <p>Staking, airdrops, and platform development</p>
-        </div>
-        <div class="feature-card">
-          <div class="icon">🌍</div>
-          <h3>2026</h3>
-          <p>Launch of Splufik casino, exchange & mobile wallet</p>
-        </div>
-      </div>
-    </div>
-  </section>
+  const connector = new TonConnect({
+    manifestUrl: window.location.origin + '/tonconnect-manifest.json',
+  });
 
-  <!-- Newsletter -->
-  <section id="newsletter" class="newsletter">
-    <div class="container">
-      <h2>Stay Updated</h2>
-      <p>Subscribe to our newsletter to receive project updates, giveaways, and launch news.</p>
-      <form class="newsletter-form">
-        <input type="email" placeholder="Enter your email" required />
-        <button class="btn primary" type="submit">Subscribe</button>
-      </form>
-    </div>
-  </section>
+  let walletConnected = false;
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="footer-col">
-          <h3>SPK Token</h3>
-          <ul>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Terms of Service</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h3>Community</h3>
-          <ul>
-            <li><a href="https://t.me/+pfQZh-Qznfk4Yzdh" target="_blank">Telegram</a></li>
-            <li><a href="#">Twitter</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        &copy; 2025 SPK Token. All rights reserved.
-      </div>
-    </div>
-  </footer>
+  async function connectWallet() {
+    if (!walletConnected) {
+      try {
+        await connector.connect();
+        walletConnected = true;
+        const walletAddress = connector.account.address;
+        connectBtn.textContent = walletAddress.slice(0, 6) + "..." + walletAddress.slice(-4);
+        console.log("Connected wallet:", walletAddress);
+      } catch (error) {
+        console.error("Connection error:", error);
+        alert("Failed to connect wallet. Make sure you have a compatible TON wallet installed.");
+      }
+    } else {
+      // Disconnect logic
+      walletConnected = false;
+      connectBtn.textContent = "Connect Wallet";
+      connector.disconnect();
+      console.log("Disconnected wallet");
+    }
+  }
 
-  <script>
-    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-      manifestUrl: window.location.origin + "/tonconnect-manifest.json",
-      buttonRootId: "ton-connect"
-    });
-  </script>
+  connectBtn.addEventListener("click", connectWallet);
+
+  // Optional: handle connection lost
+  connector.onStatusChange((connected) => {
+    if (!connected) {
+      walletConnected = false;
+      connectBtn.textContent = "Connect Wallet";
+    }
+  });
+</script>
+
 </body>
 </html>
