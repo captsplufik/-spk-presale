@@ -1,9 +1,10 @@
 {
-  "name": "SPK Presale Dashboard",
-  "icon": "/icon.png",
-  "start_url": "/index.html",
-  "short_name": "SPK Presale",
-  "description": "Buy SPK tokens during the presale.",
-  "permissions": ["tonClient"],
-  "wallets": ["tonkeeper", "tonhub", "everwallet"]
+  "manifest_version": "1",
+  "name": "SPK Token Presale",
+  "description": "Connect your wallet to participate in the SPK token presale on TON.",
+  "url": "https://spk-presale.vercel.app",
+  "icon_url": "https://cryptologos.cc/logos/ton-crystal-ton-logo.png?v=032",
+  "bridge_url": "https://bridge.tonapi.io/bridge",
+  "terms_of_use_url": "https://spk-presale.vercel.app/terms",
+  "privacy_policy_url": "https://spk-presale.vercel.app/privacy"
 }
