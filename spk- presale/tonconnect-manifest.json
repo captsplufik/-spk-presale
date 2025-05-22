@@ -1,9 +1,10 @@
 {
   "name": "SPK Presale Dashboard",
-  "icon": "/icon.png",
-  "start_url": "/index.html",
+  "icon": "https://spk-presale-yourname.vercel.app/icon.png",
+  "start_url": "https://spk-presale-yourname.vercel.app/index.html",
   "short_name": "SPK Presale",
   "description": "Buy SPK tokens during the presale.",
   "permissions": ["tonClient"],
   "wallets": ["tonkeeper", "tonhub", "everwallet"]
 }
+
