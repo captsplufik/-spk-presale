@@ -2,156 +2,129 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SPK Token Presale</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0; padding: 0;
-      background: #fff;
-      color: #222;
-      line-height: 1.6;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
     }
     header, section {
-      max-width: 900px;
-      margin: auto;
-      padding: 40px 20px;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 960px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-    header {
-      background: #0053b3;
-      color: white;
-      text-align: center;
-      padding: 80px 20px;
+    h1, h2, h3 {
+      color: #333;
     }
-    header h1 {
-      font-size: 2.8rem;
-      margin-bottom: 0.2em;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
     }
-    header p {
-      font-size: 1.3rem;
-      margin-bottom: 1.5em;
+    table, th, td {
+      border: 1px solid #ccc;
     }
-    #connectWalletBtn {
-      background-color: #ffd700;
-      border: none;
-      color: #000;
-      font-weight: bold;
-      padding: 12px 30px;
-      font-size: 1.1rem;
-      cursor: pointer;
-      border-radius: 5px;
-      transition: background-color 0.3s ease;
+    th, td {
+      padding: 12px;
+      text-align: left;
     }
-    #connectWalletBtn:hover {
-      background-color: #ffc107;
-    }
-    h2 {
-      font-size: 2rem;
-      margin-bottom: 0.5em;
-      border-bottom: 3px solid #0053b3;
-      padding-bottom: 0.3em;
-    }
-    h3 {
-      margin-top: 1.5em;
-      color: #0053b3;
-    }
-    ul {
-      list-style-type: disc;
-      padding-left: 20px;
-    }
-    section.about p, section.roadmap p {
-      max-width: 700px;
-    }
-    section.roadmap {
-      background-color: #f8f9fa;
+    #tonconnect-button {
+      margin: 20px 0;
     }
   </style>
 </head>
 <body>
+  <header>
+    <h1>SPK Token Presale</h1>
+    <div id="tonconnect-button"></div>
+  </header>
 
-<header>
-  <h1>SPK Token Presale</h1>
-  <p>Buy SPK tokens at 0.05 TON per token during our presale.</p>
-  <button id="connectWalletBtn">Connect Wallet</button>
-</header>
+  <section>
+    <h2>About SPK</h2>
+    <p>
+      The decentralized finance (DeFi) landscape is rapidly evolving, but still faces challenges related to accessibility, capital efficiency, and sustainable yield generation. Introducing Splufik Token (SPK), a native utility and governance token built on the TON Blockchain, designed to empower users with enhanced control, transparent financial opportunities, and a truly community-driven ecosystem.
+    </p>
+    <p>
+      Splufik aims to bridge the gap between complex DeFi protocols and everyday users, providing intuitive tools and sustainable mechanisms for participation. Our mission is to create a vibrant, secure, and highly liquid environment where users can maximize their digital asset potential while contributing to the network's growth and stability.
+    </p>
+    <h3>Core Utility of SPK:</h3>
+    <ul>
+      <li><strong>Governance:</strong> Propose and vote on key protocol decisions.</li>
+      <li><strong>Staking Rewards:</strong> Stake SPK to earn protocol fees and new tokens.</li>
+      <li><strong>Liquidity Provision Incentives:</strong> Rewards for liquidity providers.</li>
+      <li><strong>Fee Reduction:</strong> Reduced transaction fees and enhanced yield opportunities.</li>
+      <li><strong>Exclusive Access:</strong> Premium features for SPK stakers.</li>
+    </ul>
+  </section>
 
-<section class="about" id="about">
-  <h2>About SPK</h2>
-  <p>
-    The decentralized finance (DeFi) landscape is rapidly evolving, but still faces challenges related to accessibility, capital efficiency, and sustainable yield generation. Introducing <strong>Splufik Token (SPK)</strong>, a native utility and governance token built on the TON Blockchain, designed to empower users with enhanced control, transparent financial opportunities, and a truly community-driven ecosystem.
-  </p>
-  <p>
-    Splufik aims to bridge the gap between complex DeFi protocols and everyday users, providing intuitive tools and sustainable mechanisms for participation. Our mission is to create a vibrant, secure, and highly liquid environment where users can maximize their digital asset potential while contributing to the network's growth and stability.
-  </p>
-  <h3>Core Utility of SPK:</h3>
-  <ul>
-    <li><strong>Governance:</strong> SPK holders will have the power to propose and vote on key decisions affecting the Splufik protocol, including fee structures, feature upgrades, and treasury allocations, ensuring a truly decentralized governance model.</li>
-    <li><strong>Staking Rewards:</strong> Users can stake their SPK to secure the network and earn a share of protocol fees and newly minted tokens, fostering long-term commitment.</li>
-    <li><strong>Liquidity Provision Incentives:</strong> SPK will be used to incentivize liquidity providers on decentralized exchanges, ensuring deep liquidity for trading pairs and reducing slippage.</li>
-    <li><strong>Fee Reduction:</strong> SPK holders may benefit from reduced transaction fees or enhanced yield opportunities within the Splufik ecosystem.</li>
-    <li><strong>Exclusive Access:</strong> Future features, such as premium analytics, early access to new products, or participation in exclusive pools, may be reserved for SPK stakers.</li>
-  </ul>
-</section>
+  <section>
+    <h2>Development Roadmap</h2>
+    <h3>Phase 1: Foundation & Launch (Q3 2025 - Q5 2025)</h3>
+    <ul>
+      <li>Smart Contract Development & Audit</li>
+      <li>Token Generation Event (TGE) & Fair Launch</li>
+      <li>Initial DEX Listing (IDEX) & Liquidity Bootstrap</li>
+      <li>Official Website & Whitepaper Launch</li>
+      <li>Community Building & Initial Marketing</li>
+    </ul>
+    <h3>Phase 2: Ecosystem Expansion & Utility (Q1 2026 - Q3 2026)</h3>
+    <ul>
+      <li>SPK Staking Platform Launch</li>
+      <li>Decentralized Autonomous Organization (DAO)</li>
+      <li>Strategic Partnerships & Integrations</li>
+      <li>Cross-Chain Bridge Development</li>
+      <li>Splufik Analytics Dashboard</li>
+      <li>Mobile App Development (Beta)</li>
+    </ul>
+    <h3>Phase 3: Advanced Features & Mass Adoption (Q4 2026+)</h3>
+    <ul>
+      <li>Advanced Yield Farming & Liquidity Mining</li>
+      <li>DEX Integration</li>
+      <li>Insurance & Risk Management</li>
+      <li>Real-World Asset Tokenization</li>
+      <li>Layer 2 Scaling Solutions</li>
+      <li>Global Marketing & User Onboarding</li>
+    </ul>
+  </section>
 
-<section class="roadmap" id="roadmap">
-  <h2>Development Roadmap</h2>
-  <p>Our roadmap outlines a strategic, phased approach to building a robust and sustainable DeFi ecosystem on the TON Blockchain. We are committed to transparency and community engagement throughout our journey.</p>
+  <section>
+    <h2>Token Allocation (2B Total Supply)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Percentage</th>
+          <th>Tokens</th>
+          <th>Vesting Schedule</th>
+          <th>Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Presale</td><td>25%</td><td>500,000,000</td><td>20% TGE, 6mo cliff, 12mo linear</td><td>Early funding</td></tr>
+        <tr><td>Liquidity Pool</td><td>20%</td><td>400,000,000</td><td>50% locked 2y, 50% continuous adds</td><td>DEX stability</td></tr>
+        <tr><td>Team & Dev</td><td>10%</td><td>200,000,000</td><td>12mo cliff, 24mo linear</td><td>Core development</td></tr>
+        <tr><td>Staking Rewards</td><td>15%</td><td>300,000,000</td><td>48mo linear (~10.4M/month)</td><td>User incentives</td></tr>
+        <tr><td>Ecosystem Fund</td><td>15%</td><td>300,000,000</td><td>DAO-controlled (quarterly unlocks)</td><td>Partnerships, grants</td></tr>
+        <tr><td>Marketing</td><td>8%</td><td>160,000,000</td><td>25% TGE, 18mo linear</td><td>CEX listings, ads</td></tr>
+        <tr><td>Advisors</td><td>5%</td><td>100,000,000</td><td>6mo cliff, 18mo linear</td><td>Strategic guidance</td></tr>
+        <tr><td>Airdrops</td><td>2%</td><td>40,000,000</td><td>100% at TGE</td><td>Community growth</td></tr>
+      </tbody>
+    </table>
+  </section>
 
-  <h3>Phase 1: Foundation & Launch (Q3 2025 - Q5 2025)</h3>
-  <ul>
-    <li><strong>Smart Contract Development & Audit:</strong> Completion of SPK token smart contract development. Comprehensive security audits by leading blockchain security firms.</li>
-    <li><strong>Token Generation Event (TGE) & Fair Launch:</strong> Public sale/distribution of SPK tokens with emphasis on fair distribution mechanisms to prevent whale manipulation.</li>
-    <li><strong>Initial DEX Listing (IDEX) & Liquidity Bootstrap:</strong> Listing SPK on major decentralized exchanges on the TON Chain and provision of initial liquidity.</li>
-    <li><strong>Official Website & Whitepaper Launch:</strong> Deployment of the Splufik official website and release of the comprehensive whitepaper.</li>
-    <li><strong>Community Building & Initial Marketing:</strong> Establishment of official Telegram, Discord, and Twitter channels and launch of initial marketing campaigns.</li>
-  </ul>
-
-  <h3>Phase 2: Ecosystem Expansion & Utility (Q1 2026 - Q3 2026)</h3>
-  <ul>
-    <li><strong>SPK Staking Platform Launch:</strong> Deployment of the official SPK staking module and transparent reward distribution.</li>
-    <li><strong>Decentralized Autonomous Organization (DAO) Implementation:</strong> Launch of the Splufik governance portal for proposals and voting by SPK holders.</li>
-    <li><strong>Strategic Partnerships & Integrations:</strong> Collaborations with other DeFi protocols and integration with lending/borrowing platforms.</li>
-    <li><strong>Cross-Chain Bridge Development:</strong> Research and development of secure bridges to other blockchain networks.</li>
-    <li><strong>Splufik Analytics Dashboard:</strong> Development of a user-friendly dashboard for tracking SPK metrics.</li>
-    <li><strong>Mobile App Development (Beta):</strong> Initiate development of a mobile app for Splufik features.</li>
-  </ul>
-
-  <h3>Phase 3: Advanced Features & Mass Adoption (Q4 2026 Onwards)</h3>
-  <ul>
-    <li><strong>Advanced Yield Farming & Liquidity Mining Programs:</strong> Introduction of diverse yield farming strategies and liquidity mining incentives.</li>
-    <li><strong>Splufik Decentralized Exchange (DEX) Integration:</strong> Development or integration with a native DEX/AMM.</li>
-    <li><strong>Insurance & Risk Management Solutions:</strong> Explore protocol insurance and risk mitigation mechanisms.</li>
-    <li><strong>Real-World Asset Tokenization Exploration:</strong> Research into tokenizing real-world assets on TON.</li>
-    <li><strong>Layer 2 Scaling Solutions Integration:</strong> Evaluate and integrate Layer 2 solutions on TON.</li>
-    <li><strong>Global Marketing & User Onboarding Campaigns:</strong> Expand marketing efforts and develop onboarding for non-crypto native users.</li>
-  </ul>
-
-  <p>This roadmap is a living document and may be adjusted based on technological advancements, community feedback, and market conditions. We invite all enthusiasts, developers, and users to join us in building the future of decentralized finance with Splufik.</p>
-</section>
-
-<script type="module">
-  import { TonConnect } from "https://cdn.jsdelivr.net/npm/@tonconnect/sdk@0.9.14/+esm";
-
-  const tonConnect = new TonConnect({ manifestUrl: 'https://spk-presale.vercel.app/tonconnect-manifest.json' });
-
-  const connectWalletBtn = document.getElementById('connectWalletBtn');
-
-  connectWalletBtn.onclick = async () => {
-    if (!tonConnect.connected) {
-      await tonConnect.connect();
-    } else {
-      tonConnect.disconnect();
-    }
-  };
-
-  tonConnect.onStatusChange((wallet) => {
-    if (wallet) {
-      connectWalletBtn.textContent = `Connected: ${wallet.account.address.slice(0, 6)}...${wallet.account.address.slice(-6)}`;
-    } else {
-      connectWalletBtn.textContent = 'Connect Wallet';
-    }
-  });
-</script>
-
+  <script>
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+      manifestUrl: 'https://spk-presale.vercel.app/tonconnect-manifest.json',
+      buttonRootId: 'tonconnect-button'
+    });
+  </script>
 </body>
 </html>
