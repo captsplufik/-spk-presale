@@ -1,189 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Your Crypto Platform</title>
-    <link rel="stylesheet" href="styles.css" />
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SPK Token Presale - Connect Wallet</title>
+<style>
+  /* Minimal CSS for the button & page */
+  :root {
+    --primary: #6c5ce7;
+    --primary-dark: #5649c0;
+    --dark: #2d3436;
+    --light: #f5f6fa;
+    --success: #00b894;
+  }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--light);
+    color: var(--dark);
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+  }
+  .btn {
+    padding: 12px 25px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    background-color: var(--primary);
+    color: white;
+    transition: background-color 0.3s ease;
+  }
+  .btn:hover {
+    background-color: var(--primary-dark);
+  }
+</style>
 </head>
 <body>
 
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="container">
-            <a href="#" class="logo">Crypto<span>Zone</span></a>
-            <div class="nav-links">
-                <a href="#">Home</a>
-                <a href="#market">Market</a>
-                <a href="#features">Features</a>
-                <a href="#newsletter">Newsletter</a>
-                <a href="#" class="btn connect-wallet">Connect Wallet</a>
-            </div>
-            <div class="hamburger">
-                <i class="fas fa-bars"></i>
-            </div>
-        </div>
-    </nav>
+<button id="connect-wallet" class="btn">Connect Wallet</button>
 
-    <!-- Price Ticker -->
-    <div class="price-ticker">
-        <div class="container ticker-container">
-            <div class="ticker-item">
-                <img src="btc-icon.png" alt="BTC"/>
-                <div class="coin-info">
-                    <span class="symbol">BTC</span>
-                    <span class="price">$67,000</span>
-                    <span class="change positive">+2.3%</span>
-                </div>
-            </div>
-            <div class="ticker-item">
-                <img src="eth-icon.png" alt="ETH"/>
-                <div class="coin-info">
-                    <span class="symbol">ETH</span>
-                    <span class="price">$3,200</span>
-                    <span class="change negative">-0.8%</span>
-                </div>
-            </div>
-            <!-- Add more coins as needed -->
-        </div>
-    </div>
+<script type="module">
+  import { TonConnect } from "https://cdn.jsdelivr.net/npm/@tonconnect/sdk@0.20.7/dist/tonconnect.sdk.es.js";
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h1>Trade & Earn with <span>CryptoZone</span></h1>
-                <p>Buy, sell, and stake your favorite cryptocurrencies with ease. Trusted, secure, and fast trading platform for everyone.</p>
-                <div class="cta-buttons">
-                    <button class="btn primary">Get Started</button>
-                    <button class="btn secondary">Learn More</button>
-                </div>
-            </div>
-            <div class="hero-image">
-                <img src="hero-img.png" alt="Crypto Dashboard"/>
-            </div>
-        </div>
-    </section>
+  const connectBtn = document.getElementById("connect-wallet");
 
-    <!-- Market Overview -->
-    <section class="market-overview" id="market">
-        <div class="container">
-            <h2>Market Overview</h2>
-            <div class="market-filters">
-                <button class="filter-btn active">All</button>
-                <button class="filter-btn">DeFi</button>
-                <button class="filter-btn">NFT</button>
-                <button class="filter-btn">Gaming</button>
-            </div>
-            <div class="market-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Coin</th>
-                            <th>Price</th>
-                            <th>24h Change</th>
-                            <th>Market Cap</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Bitcoin (BTC)</td>
-                            <td>$67,000</td>
-                            <td class="change positive">+2.3%</td>
-                            <td>$1.2T</td>
-                        </tr>
-                        <tr>
-                            <td>Ethereum (ETH)</td>
-                            <td>$3,200</td>
-                            <td class="change negative">-0.8%</td>
-                            <td>$400B</td>
-                        </tr>
-                        <!-- Add more rows as needed -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </section>
+  const connector = new TonConnect({
+    manifestUrl: window.location.origin + '/tonconnect-manifest.json',
+  });
 
-    <!-- Features -->
-    <section class="features" id="features">
-        <div class="container">
-            <h2>Why Choose Us</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="icon"><i class="fas fa-shield-alt"></i></div>
-                    <h3>Secure</h3>
-                    <p>Top-tier security protocols keep your assets safe at all times.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="icon"><i class="fas fa-tachometer-alt"></i></div>
-                    <h3>Fast Transactions</h3>
-                    <p>Experience lightning-fast transactions with minimal fees.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="icon"><i class="fas fa-chart-line"></i></div>
-                    <h3>Analytics</h3>
-                    <p>Gain powerful insights with real-time charts and data tracking.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+  let walletConnected = false;
 
-    <!-- Newsletter -->
-    <section class="newsletter" id="newsletter">
-        <div class="container">
-            <h2>Stay Updated</h2>
-            <p>Subscribe to our newsletter to get the latest updates and market insights.</p>
-            <form class="newsletter-form">
-                <input type="email" placeholder="Enter your email" required />
-                <button class="btn primary" type="submit">Subscribe</button>
-            </form>
-        </div>
-    </section>
+  async function connectWallet() {
+    if (!walletConnected) {
+      try {
+        await connector.connect();
+        walletConnected = true;
+        const walletAddress = connector.account.address;
+        connectBtn.textContent = walletAddress.slice(0, 6) + "..." + walletAddress.slice(-4);
+        console.log("Connected wallet:", walletAddress);
+      } catch (error) {
+        console.error("Connection error:", error);
+        alert("Failed to connect wallet. Make sure you have a compatible TON wallet installed.");
+      }
+    } else {
+      // Disconnect logic
+      walletConnected = false;
+      connectBtn.textContent = "Connect Wallet";
+      connector.disconnect();
+      console.log("Disconnected wallet");
+    }
+  }
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <h3>Company</h3>
-                    <ul>
-                        <li><a href="#">About</a></li>
-                        <li><a href="#">Careers</a></li>
-                        <li><a href="#">Press</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h3>Products</h3>
-                    <ul>
-                        <li><a href="#">Exchange</a></li>
-                        <li><a href="#">Wallet</a></li>
-                        <li><a href="#">Staking</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h3>Support</h3>
-                    <ul>
-                        <li><a href="#">Help Center</a></li>
-                        <li><a href="#">Contact</a></li>
-                        <li><a href="#">FAQs</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h3>Follow Us</h3>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-telegram"></i></a>
-                        <a href="#"><i class="fab fa-github"></i></a>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                &copy; 2025 CryptoZone. All rights reserved.
-            </div>
-        </div>
-    </footer>
+  connectBtn.addEventListener("click", connectWallet);
+
+  // Optional: handle connection lost
+  connector.onStatusChange((connected) => {
+    if (!connected) {
+      walletConnected = false;
+      connectBtn.textContent = "Connect Wallet";
+    }
+  });
+</script>
 
 </body>
 </html>
