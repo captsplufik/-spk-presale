@@ -3,21 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPLUFIK Token | Next-Gen GameFi Ecosystem</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+    <title>SPK Token Presale</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg: #121212;
-            --primary: #00F0FF;
-            --secondary: #FF00F5;
-            --accent: #FF9E00;
-            --text: #E0E0E0;
-            --text-dark: #888;
-            --card-bg: rgba(30, 30, 30, 0.8);
-            --card-border: rgba(0, 240, 255, 0.2);
+            --primary: #4e44ce;
+            --secondary: #2dccff;
+            --accent: #ff6b35;
+            --bg: #ffffff;
+            --text: #333333;
+            --text-light: #666666;
+            --card-bg: #f8f9fa;
+            --card-border: #e0e0e0;
         }
 
         * {
@@ -27,960 +25,130 @@
         }
 
         body {
+            font-family: 'Poppins', sans-serif;
             background-color: var(--bg);
             color: var(--text);
-            font-family: 'Rajdhani', sans-serif;
             line-height: 1.6;
-            overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 20% 30%, rgba(0, 240, 255, 0.05) 0%, transparent 20%),
-                radial-gradient(circle at 80% 70%, rgba(255, 0, 245, 0.05) 0%, transparent 20%);
         }
 
-        h1, h2, h3, h4 {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        /* [Keep all your existing CSS styles] */
+        /* Add these new styles: */
+
+        #ton-connection {
+            margin: 15px 0;
+            text-align: center;
         }
 
-        a {
-            color: var(--primary);
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        a:hover {
-            color: var(--accent);
-            text-shadow: 0 0 10px var(--accent);
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Header Styles */
-        header {
-            padding: 20px 0;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-            background-color: rgba(18, 18, 18, 0.8);
-            border-bottom: 1px solid rgba(0, 240, 255, 0.1);
-        }
-
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 28px;
-            font-weight: 700;
+        #connect-ton {
             background: linear-gradient(90deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 30px;
-        }
-
-        .nav-links a {
-            position: relative;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 600;
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -5px;
-            left: 0;
-            background-color: var(--accent);
-            transition: width 0.3s ease;
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        .connect-wallet {
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            color: var(--bg);
+            color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-family: 'Orbitron', sans-serif;
+            padding: 12px 24px;
+            border-radius: 6px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+            transition: all 0.3s;
         }
 
-        .connect-wallet:hover {
+        #connect-ton:hover {
             transform: translateY(-2px);
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.8);
+            box-shadow: 0 5px 15px rgba(78, 68, 206, 0.3);
         }
 
-        /* Hero Section */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            padding-top: 100px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(0, 240, 255, 0.05) 0%, transparent 70%);
-            animation: pulse 15s infinite alternate;
-            z-index: -1;
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: translate(0, 0);
-            }
-            50% {
-                transform: translate(50px, 50px);
-            }
-            100% {
-                transform: translate(0, 0);
-            }
-        }
-
-        .hero-content {
-            display: flex;
-            align-items: center;
-            gap: 50px;
-        }
-
-        .hero-text {
-            flex: 1;
-        }
-
-        .hero-image {
-            flex: 1;
-            position: relative;
-        }
-
-        .hero-image img {
-            width: 100%;
-            max-width: 500px;
-            animation: float 6s ease-in-out infinite;
-            filter: drop-shadow(0 0 20px rgba(0, 240, 255, 0.5));
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-20px);
-            }
-            100% {
-                transform: translateY(0);
-            }
-        }
-
-        .hero h1 {
-            font-size: 60px;
-            margin-bottom: 20px;
-            line-height: 1.2;
-            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
-        }
-
-        .hero p {
-            font-size: 20px;
-            margin-bottom: 30px;
-            max-width: 600px;
-        }
-
-        .cta-buttons {
-            display: flex;
-            gap: 20px;
-            margin-top: 40px;
-        }
-
-        .btn {
-            padding: 15px 30px;
-            border-radius: 5px;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .btn-primary {
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            color: var(--bg);
-            border: none;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 0 25px rgba(0, 240, 255, 0.8);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
-        }
-
-        .btn-outline:hover {
-            background: rgba(0, 240, 255, 0.1);
-            transform: translateY(-3px);
-            box-shadow: 0 0 25px rgba(0, 240, 255, 0.5);
-        }
-
-        /* Presale Section */
-        .presale-section {
-            padding: 100px 0;
-            position: relative;
-        }
-
-        .presale-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(255, 0, 245, 0.05) 0%, transparent 70%);
-            z-index: -1;
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 60px;
-            font-size: 40px;
-            color: var(--primary);
-            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
-        }
-
-        .presale-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 10px;
-            padding: 40px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 30px rgba(0, 240, 255, 0.1);
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .countdown {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .countdown-item {
-            text-align: center;
-        }
-
-        .countdown-item span {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 50px;
-            font-weight: 700;
-            color: var(--primary);
-            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
-        }
-
-        .countdown-item small {
-            display: block;
-            font-size: 16px;
-            color: var(--text-dark);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .progress-container {
-            margin-bottom: 40px;
-        }
-
-        .progress-label {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .progress-bar {
-            height: 10px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        .progress {
-            height: 100%;
-            width: 65%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            border-radius: 5px;
-            position: relative;
-            animation: progress-animation 2s ease-in-out;
-        }
-
-        @keyframes progress-animation {
-            from { width: 0; }
-            to { width: 65%; }
-        }
-
-        .progress::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(
-                90deg,
-                rgba(255, 255, 255, 0) 0%,
-                rgba(255, 255, 255, 0.3) 50%,
-                rgba(255, 255, 255, 0) 100%
-            );
-            animation: shimmer 2s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        .presale-form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        .input-group {
-            position: relative;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 15px 20px;
-            background-color: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--primary);
-            border-radius: 5px;
-            color: var(--text);
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 15px rgba(255, 153, 0, 0.5);
-        }
-
-        .input-group label {
-            position: absolute;
-            left: 20px;
-            top: -10px;
-            background-color: var(--bg);
-            padding: 0 10px;
+        #ton-wallet-address {
+            margin-top: 10px;
             font-size: 14px;
-            color: var(--primary);
-        }
-
-        .token-price {
-            text-align: center;
-            font-size: 18px;
-            margin-top: 20px;
-        }
-
-        .token-price span {
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        /* Token Details Grid */
-        .token-details-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 40px;
-        }
-
-        .token-detail-card {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--primary);
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .token-detail-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 240, 255, 0.2);
-            border-color: var(--accent);
-        }
-
-        .token-detail-card h3 {
-            color: var(--accent);
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-
-        /* Tokenomics Section */
-        .tokenomics-section {
-            padding: 100px 0;
-            background-color: rgba(0, 0, 0, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .tokenomics-section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 153, 0, 0.05) 0%, transparent 70%);
-            animation: pulse2 15s infinite alternate;
-            z-index: -1;
-        }
-
-        @keyframes pulse2 {
-            0% {
-                transform: translate(0, 0);
-            }
-            50% {
-                transform: translate(-50px, -50px);
-            }
-            100% {
-                transform: translate(0, 0);
-            }
-        }
-
-        .tokenomics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: 50px;
-        }
-
-        .tokenomics-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 10px;
-            padding: 30px;
-            backdrop-filter: blur(5px);
-            transition: all 0.3s ease;
-        }
-
-        .tokenomics-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 10px 30px rgba(0, 240, 255, 0.2);
-            border-color: var(--accent);
-        }
-
-        .tokenomics-card h3 {
-            color: var(--primary);
-            margin-bottom: 15px;
-            font-size: 24px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .tokenomics-card h3 i {
-            color: var(--accent);
-        }
-
-        .tokenomics-card p {
-            color: var(--text-dark);
-        }
-
-        .chart-container {
-            margin-top: 50px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* Roadmap Section */
-        .roadmap-section {
-            padding: 100px 0;
-            position: relative;
-        }
-
-        .roadmap-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(255, 0, 245, 0.05) 0%, transparent 70%);
-            z-index: -1;
-        }
-
-        .timeline {
-            position: relative;
-            max-width: 800px;
-            margin: 50px auto 0;
-        }
-
-        .timeline::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 2px;
-            height: 100%;
-            background: linear-gradient(to bottom, var(--primary), var(--secondary));
-        }
-
-        .timeline-item {
-            position: relative;
-            margin-bottom: 50px;
-            width: 100%;
-        }
-
-        .timeline-item:nth-child(odd) .timeline-content {
-            left: 0;
-            text-align: right;
-            padding-right: 70px;
-        }
-
-        .timeline-item:nth-child(even) .timeline-content {
-            left: 50%;
-            padding-left: 70px;
-        }
-
-        .timeline-content {
-            position: relative;
-            width: 50%;
-        }
-
-        .timeline-date {
-            color: var(--accent);
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .timeline-dot {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
-            z-index: 1;
-        }
-
-        /* Team Section */
-        .team-section {
-            padding: 100px 0;
-            background-color: rgba(0, 0, 0, 0.3);
-        }
-
-        .team-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            margin-top: 50px;
-        }
-
-        .team-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 10px;
-            padding: 30px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .team-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 10px 30px rgba(255, 0, 245, 0.2);
-            border-color: var(--secondary);
-        }
-
-        .team-image {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            overflow: hidden;
-            border: 3px solid var(--primary);
-            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
-        }
-
-        .team-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .team-card h3 {
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-
-        .team-card p {
-            color: var(--text-dark);
-            margin-bottom: 15px;
-        }
-
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .social-links a {
-            color: var(--text);
-            font-size: 18px;
-            transition: all 0.3s ease;
-        }
-
-        .social-links a:hover {
-            color: var(--accent);
-            transform: translateY(-3px);
-        }
-
-        /* FAQ Section */
-        .faq-section {
-            padding: 100px 0;
-        }
-
-        .accordion {
-            max-width: 800px;
-            margin: 50px auto 0;
-        }
-
-        .accordion-item {
-            margin-bottom: 15px;
-            border: 1px solid var(--card-border);
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        .accordion-header {
-            background-color: var(--card-bg);
-            padding: 20px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
-
-        .accordion-header:hover {
-            background-color: rgba(0, 240, 255, 0.1);
-        }
-
-        .accordion-header h3 {
-            color: var(--primary);
-            font-size: 18px;
-            margin: 0;
-        }
-
-        .accordion-header i {
-            color: var(--accent);
-            transition: transform 0.3s ease;
-        }
-
-        .accordion-content {
-            background-color: rgba(0, 0, 0, 0.3);
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-
-        .accordion-content-inner {
-            padding: 20px;
-        }
-
-        .accordion-item.active .accordion-header i {
-            transform: rotate(180deg);
-        }
-
-        /* Footer */
-        footer {
-            background-color: #000;
-            padding: 50px 0 20px;
-            text-align: center;
-            position: relative;
-        }
-
-        .footer-logo {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 28px;
-            font-weight: 700;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
-            margin-bottom: 30px;
+            background: rgba(78, 68, 206, 0.1);
+            padding: 8px;
+            border-radius: 4px;
             display: inline-block;
         }
 
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 30px;
-            margin-bottom: 30px;
+        .roadmap {
+            margin: 40px 0;
         }
 
-        .footer-links a {
-            color: var(--text);
-            transition: all 0.3s ease;
+        .phase {
+            background: white;
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
-        .footer-links a:hover {
-            color: var(--accent);
+        .phase h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
         }
 
-        .social-links-footer {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 30px;
+        .phase ul {
+            padding-left: 20px;
         }
 
-        .social-links-footer a {
-            color: var(--text);
-            font-size: 24px;
-            transition: all 0.3s ease;
-        }
-
-        .social-links-footer a:hover {
-            color: var(--accent);
-            transform: translateY(-3px);
-        }
-
-        .copyright {
-            color: var(--text-dark);
-            font-size: 14px;
-            margin-top: 30px;
-        }
-
-        /* Glow Effects */
-        .glow-primary {
-            text-shadow: 0 0 10px rgba(0, 240, 255, 0.7);
-        }
-
-        .glow-secondary {
-            text-shadow: 0 0 10px rgba(255, 0, 245, 0.7);
-        }
-
-        .glow-accent {
-            text-shadow: 0 0 10px rgba(255, 153, 0, 0.7);
-        }
-
-        /* Responsive Styles */
-        @media (max-width: 992px) {
-            .hero-content {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .hero-text {
-                margin-bottom: 50px;
-            }
-
-            .hero h1 {
-                font-size: 48px;
-            }
-
-            .cta-buttons {
-                justify-content: center;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-
-            .hero h1 {
-                font-size: 36px;
-            }
-
-            .hero p {
-                font-size: 18px;
-            }
-
-            .countdown {
-                gap: 15px;
-            }
-
-            .countdown-item span {
-                font-size: 36px;
-            }
-
-            .timeline::before {
-                left: 20px;
-            }
-
-            .timeline-item:nth-child(odd) .timeline-content,
-            .timeline-item:nth-child(even) .timeline-content {
-                left: 0;
-                width: 100%;
-                padding-left: 70px;
-                padding-right: 20px;
-                text-align: left;
-            }
-
-            .presale-card {
-                padding: 30px 20px;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .btn {
-                padding: 12px 20px;
-                font-size: 14px;
-            }
-
-            .section-title {
-                font-size: 32px;
-            }
-
-            .countdown-item span {
-                font-size: 28px;
-            }
+        .phase li {
+            margin-bottom: 8px;
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
+    <!-- Header Section -->
     <header>
-        <div class="container header-container">
-            <a href="#" class="logo">SPLUFIK</a>
+        <div class="container">
+            <a href="#" class="logo">SPK</a>
             <nav class="nav-links">
                 <a href="#presale">Presale</a>
                 <a href="#tokenomics">Tokenomics</a>
                 <a href="#roadmap">Roadmap</a>
-                <a href="#team">Team</a>
                 <a href="#faq">FAQ</a>
             </nav>
-            <button class="connect-wallet">
-                <i class="fas fa-wallet"></i> Connect Wallet
-            </button>
+            <div id="ton-connection">
+                <button id="connect-ton">
+                    <i class="fas fa-wallet"></i> 
+                    <span id="ton-wallet-status">Connect TON Wallet</span>
+                </button>
+                <div id="ton-wallet-address"></div>
+            </div>
         </div>
     </header>
-
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container hero-content">
-            <div class="hero-text">
-                <h1>Enter the <span class="glow-primary">SPLUFIK Token</span> <span class="glow-secondary">Metaverse</span></h1>
-                <p>The revolutionary GameFi token powering the next generation of blockchain gaming experiences.</p>
-                <div class="cta-buttons">
-                    <a href="#presale" class="btn btn-primary">Join Presale</a>
-                    <a href="#whitepaper" class="btn btn-outline">Whitepaper</a>
-                </div>
-            </div>
-            <div class="hero-image">
-                <img src="https://via.placeholder.com/500x500/121212/00F0FF?text=SPLUFIK+Token" alt="SPLUFIK Token">
-            </div>
-        </div>
-    </section>
 
     <!-- Presale Section -->
     <section id="presale" class="presale-section">
         <div class="container">
-            <h2 class="section-title glow-primary">SPLUFIK Token Presale</h2>
+            <h2>SPK Token Presale</h2>
             <div class="presale-card">
                 <div class="countdown">
                     <div class="countdown-item">
-                        <span id="days">05</span>
+                        <span id="days">00</span>
                         <small>Days</small>
                     </div>
                     <div class="countdown-item">
-                        <span id="hours">12</span>
+                        <span id="hours">00</span>
                         <small>Hours</small>
                     </div>
                     <div class="countdown-item">
-                        <span id="minutes">30</span>
+                        <span id="minutes">00</span>
                         <small>Minutes</small>
                     </div>
                 </div>
                 
                 <div class="progress-container">
                     <div class="progress-label">
-                        <span>Raised: <strong id="raised">$1,250,000</strong></span>
-                        <span>Target: <strong id="target">$2,000,000</strong></span>
+                        <span>Raised: <strong>$1,250,000</strong></span>
+                        <span>Target: <strong>$5,000,000</strong></span>
                     </div>
                     <div class="progress-bar">
-                        <div class="progress" style="width: 65%"></div>
+                        <div class="progress" id="presaleProgress" style="width: 0%"></div>
                     </div>
                 </div>
                 
                 <div class="presale-form">
                     <div class="input-group">
-                        <label for="presaleAmount">Amount</label>
-                        <input type="number" id="presaleAmount" placeholder="Enter ETH amount">
+                        <label for="presaleAmount">Amount (TON)</label>
+                        <input type="number" id="presaleAmount" min="1" max="500" placeholder="1 to 500 TON">
                     </div>
                     <button class="btn btn-primary">Contribute Now</button>
-                    <p class="token-price">1 ETH = <span id="tokenRate">10,000</span> SPLUFIK</p>
-                </div>
-                
-                <!-- Token Details Grid -->
-                <div class="token-details-grid">
-                    <div class="token-detail-card">
-                        <h3>2B</h3>
-                        <p>Total Supply</p>
-                    </div>
-                    <div class="token-detail-card">
-                        <h3>15%</h3>
-                        <p>Presale Allocation</p>
-                    </div>
-                    <div class="token-detail-card">
-                        <h3>3%</h3>
-                        <p>Transaction Tax</p>
-                    </div>
-                    <div class="token-detail-card">
-                        <h3>25%</h3>
-                        <p>Staking Rewards</p>
-                    </div>
+                    <p class="token-price">1 TON = <span>20 SPK</span></p>
                 </div>
             </div>
         </div>
@@ -989,28 +157,23 @@
     <!-- Tokenomics Section -->
     <section id="tokenomics" class="tokenomics-section">
         <div class="container">
-            <h2 class="section-title glow-secondary">SPLUFIK Tokenomics</h2>
-            
-            <div class="chart-container">
-                <canvas id="tokenomicsChart"></canvas>
-            </div>
-            
+            <h2>Tokenomics</h2>
             <div class="tokenomics-grid">
                 <div class="tokenomics-card">
                     <h3><i class="fas fa-coins"></i> Presale</h3>
-                    <p>15% of total supply (300M tokens) allocated for presale with vesting</p>
+                    <p>25% (500M SPK)<br>6mo cliff, 12mo vesting</p>
                 </div>
                 <div class="tokenomics-card">
                     <h3><i class="fas fa-lock"></i> Liquidity</h3>
-                    <p>20% locked for 2 years to ensure price stability</p>
+                    <p>20% (400M SPK)<br>2 year lock</p>
                 </div>
                 <div class="tokenomics-card">
                     <h3><i class="fas fa-chart-line"></i> Staking</h3>
-                    <p>25% allocated for rewards with dynamic APY system</p>
+                    <p>15% (300M SPK)<br>48mo linear release</p>
                 </div>
                 <div class="tokenomics-card">
-                    <h3><i class="fas fa-fire"></i> Deflationary</h3>
-                    <p>3% transaction tax (1% burn, 1% LP, 1% staking rewards)</p>
+                    <h3><i class="fas fa-cogs"></i> Ecosystem</h3>
+                    <p>15% (300M SPK)<br>DAO controlled</p>
                 </div>
             </div>
         </div>
@@ -1019,255 +182,96 @@
     <!-- Roadmap Section -->
     <section id="roadmap" class="roadmap-section">
         <div class="container">
-            <h2 class="section-title glow-accent">SPLUFIK Roadmap</h2>
-            
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-date">Q1 2024</div>
-                        <h3>Project Launch</h3>
-                        <p>Concept development and team formation</p>
-                    </div>
+            <h2>Roadmap</h2>
+            <div class="roadmap">
+                <div class="phase">
+                    <h3>Phase 1: Foundation & Launch (Q3–Q5 2025)</h3>
+                    <ul>
+                        <li>Smart contract development and security audits</li>
+                        <li>Token Generation Event and public launch</li>
+                        <li>Initial DEX listing and liquidity provision</li>
+                    </ul>
                 </div>
-                <div class="timeline-item">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-date">Q2 2024</div>
-                        <h3>Presale Phase</h3>
-                        <p>Token presale launch and community building</p>
-                    </div>
+                <div class="phase">
+                    <h3>Phase 2: Ecosystem Expansion (Q1–Q3 2026)</h3>
+                    <ul>
+                        <li>Launch SPK staking platform</li>
+                        <li>DAO governance rollout</li>
+                        <li>Strategic partnerships and integrations</li>
+                    </ul>
                 </div>
-                <div class="timeline-item">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-date">Q3 2024</div>
-                        <h3>Exchange Listings</h3>
-                        <p>DEX listings with locked liquidity</p>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-date">Q4 2024</div>
-                        <h3>Game Integration</h3>
-                        <p>First game partnerships using SPLUFIK token</p>
-                    </div>
+                <div class="phase">
+                    <h3>Phase 3: Mass Adoption (Q4 2026+)</h3>
+                    <ul>
+                        <li>Advanced yield farming and liquidity mining</li>
+                        <li>DEX integration and trading optimization</li>
+                        <li>Layer 2 integration and global outreach</li>
+                    </ul>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Team Section -->
-    <section id="team" class="team-section">
-        <div class="container">
-            <h2 class="section-title glow-primary">The Team</h2>
-            <div class="team-grid">
-                <div class="team-card">
-                    <div class="team-image">
-                        <img src="https://via.placeholder.com/120x120/121212/00F0FF?text=CEO" alt="Team Member">
-                    </div>
-                    <h3>John Cyber</h3>
-                    <p>Founder & CEO</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-linkedin"></i></a>
-                    </div>
-                </div>
-                <div class="team-card">
-                    <div class="team-image">
-                        <img src="https://via.placeholder.com/120x120/121212/FF00F5?text=CTO" alt="Team Member">
-                    </div>
-                    <h3>Sarah Byte</h3>
-                    <p>CTO</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-linkedin"></i></a>
-                    </div>
-                </div>
-                <div class="team-card">
-                    <div class="team-image">
-                        <img src="https://via.placeholder.com/120x120/121212/FF9E00?text=CMO" alt="Team Member">
-                    </div>
-                    <h3>Mike Neon</h3>
-                    <p>CMO</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-linkedin"></i></a>
-                    </div>
-                </div>
-                <div class="team-card">
-                    <div class="team-image">
-                        <img src="https://via.placeholder.com/120x120/121212/00F0FF?text=DEV" alt="Team Member">
-                    </div>
-                    <h3>Alex Code</h3>
-                    <p>Lead Developer</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-linkedin"></i></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section id="faq" class="faq-section">
-        <div class="container">
-            <h2 class="section-title glow-secondary">FAQ</h2>
-            <div class="accordion">
-                <div class="accordion-item">
-                    <div class="accordion-header">
-                        <h3>What is SPLUFIK Token?</h3>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-content-inner">
-                            <p>SPLUFIK Token is the native cryptocurrency of our cyberpunk-themed GameFi metaverse, powering in-game transactions, governance, and staking rewards.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="accordion-item">
-                    <div class="accordion-header">
-                        <h3>When does the presale start?</h3>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-content-inner">
-                            <p>The presale is currently live and will run until we reach our hard cap or the timer expires, whichever comes first.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="accordion-item">
-                    <div class="accordion-header">
-                        <h3>How do I claim my tokens?</h3>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-content-inner">
-                            <p>Tokens will be distributed after the presale concludes. You'll be able to claim them directly from our website by connecting your wallet.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="accordion-item">
-                    <div class="accordion-header">
-                        <h3>Is the project audited?</h3>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="accordion-content">
-                        <div class="accordion-content-inner">
-                            <p>Yes, our smart contracts have been audited by CertiK. The audit report will be published before the presale ends.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-logo">SPLUFIK</div>
-            <div class="footer-links">
-                <a href="#presale">Presale</a>
-                <a href="#tokenomics">Tokenomics</a>
-                <a href="#roadmap">Roadmap</a>
-                <a href="#team">Team</a>
-                <a href="#faq">FAQ</a>
-            </div>
-            <div class="social-links-footer">
-                <a href="#"><i class="fab fa-twitter"></i></a>
-                <a href="#"><i class="fab fa-telegram"></i></a>
-                <a href="#"><i class="fab fa-discord"></i></a>
-                <a href="#"><i class="fab fa-medium"></i></a>
-                <a href="#"><i class="fab fa-github"></i></a>
-            </div>
-            <div class="copyright">
-                &copy; 2024 SPLUFIK Token. All rights reserved.
-            </div>
-        </div>
-    </footer>
+    <!-- [Keep FAQ and other sections as needed] -->
 
     <!-- JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
     <script>
-        // Initialize Chart
-        document.addEventListener('DOMContentLoaded', function() {
-            const ctx = document.getElementById('tokenomicsChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Presale', 'Liquidity', 'Team', 'Staking', 'Ecosystem', 'Marketing'],
-                    datasets: [{
-                        data: [15, 20, 10, 25, 15, 15],
-                        backgroundColor: [
-                            '#00F0FF', '#FF00F5', '#FF9E00', '#00FF88', '#6E44FF', '#FF2D75'
-                        ],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    cutout: '70%',
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: {
-                                color: '#E0E0E0',
-                                font: {
-                                    family: 'Orbitron'
-                                }
-                            }
-                        }
-                    }
-                }
-            });
+        // TON Wallet Connection
+        const connector = new TonConnect.TonConnect({
+            manifestUrl: 'https://yourdomain.com/tonconnect-manifest.json'
+        });
 
-            // Countdown Timer
-            const countdown = () => {
-                const endDate = new Date('2024-12-31').getTime();
-                const now = new Date().getTime();
-                const diff = endDate - now;
-
-                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
-                document.getElementById('days').textContent = days.toString().padStart(2, '0');
-                document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
-                document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+        document.getElementById('connect-ton').addEventListener('click', async () => {
+            const wallets = await connector.getWallets();
+            const walletConnectionSource = {
+                jsBridgeKey: 'tonconnect'
             };
+            
+            connector.connect(wallets[0], walletConnectionSource);
+        });
 
-            setInterval(countdown, 1000);
-            countdown();
+        connector.onStatusChange((wallet) => {
+            if (wallet) {
+                const shortAddress = `${wallet.account.address.slice(0, 4)}...${wallet.account.address.slice(-4)}`;
+                document.getElementById('ton-wallet-status').textContent = shortAddress;
+                document.getElementById('ton-wallet-address').style.display = 'block';
+                document.getElementById('ton-wallet-address').textContent = `Connected: ${shortAddress}`;
+            }
+        });
 
-            // Accordion Functionality
-            const accordionItems = document.querySelectorAll('.accordion-item');
-            accordionItems.forEach(item => {
-                const header = item.querySelector('.accordion-header');
-                header.addEventListener('click', () => {
-                    item.classList.toggle('active');
-                    const content = item.querySelector('.accordion-content');
-                    if (item.classList.contains('active')) {
-                        content.style.maxHeight = content.scrollHeight + 'px';
-                    } else {
-                        content.style.maxHeight = '0';
-                    }
-                });
-            });
+        // Countdown Timer
+        const launchDate = new Date('2025-06-30T00:00:00').getTime();
+        
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const diff = launchDate - now;
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            document.getElementById('days').textContent = days.toString().padStart(2, '0');
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+        }
 
-            // Wallet Connection
-            document.querySelector('.connect-wallet').addEventListener('click', async () => {
-                try {
-                    if (window.ethereum) {
-                        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                        alert(`Connected: ${accounts[0]}`);
-                    } else {
-                        alert('Please install MetaMask or another Web3 wallet');
-                    }
-                } catch (error) {
-                    console.error('Wallet connection error:', error);
-                }
-            });
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // Progress Bar Animation
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                document.getElementById('presaleProgress').style.width = '25%';
+                document.getElementById('presaleProgress').style.transition = 'width 1s ease';
+            }, 500);
+        });
+
+        // Contribution Validation
+        document.getElementById('presaleAmount').addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            if (value < 1) e.target.value = 1;
+            if (value > 500) e.target.value = 500;
         });
     </script>
 </body>
