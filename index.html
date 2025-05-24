@@ -1,95 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SPK Token Presale</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Your Crypto Platform</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
-  <header>
-    <h1>SPK Token Presale</h1>
-    <button id="connect-button">Connect Wallet</button>
-  </header>
 
-  <section id="about">
-    <h2>About SPK</h2>
-    <p>The decentralized finance (DeFi) landscape is rapidly evolving, but still faces challenges related to accessibility, capital efficiency, and sustainable yield generation. Introducing Splufik Token (SPK), a native utility and governance token built on the TON Blockchain, designed to empower users with enhanced control, transparent financial opportunities, and a truly community-driven ecosystem.</p>
-    <p>Splufik aims to bridge the gap between complex DeFi protocols and everyday users, providing intuitive tools and sustainable mechanisms for participation. Our mission is to create a vibrant, secure, and highly liquid environment where users can maximize their digital asset potential while contributing to the network's growth and stability.</p>
-    <ul>
-      <li><strong>Governance:</strong> SPK holders propose and vote on protocol decisions.</li>
-      <li><strong>Staking Rewards:</strong> Stake SPK to earn protocol fees and rewards.</li>
-      <li><strong>Liquidity Incentives:</strong> SPK incentivizes liquidity on DEXs.</li>
-      <li><strong>Fee Reduction:</strong> Reduced transaction fees for holders.</li>
-      <li><strong>Exclusive Access:</strong> Premium features and early access for stakers.</li>
-    </ul>
-  </section>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="#" class="logo">Crypto<span>Zone</span></a>
+            <div class="nav-links">
+                <a href="#">Home</a>
+                <a href="#market">Market</a>
+                <a href="#features">Features</a>
+                <a href="#newsletter">Newsletter</a>
+                <a href="#" class="btn connect-wallet">Connect Wallet</a>
+            </div>
+            <div class="hamburger">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
 
-  <section id="roadmap">
-    <h2>Development Roadmap</h2>
-    <h3>Phase 1: Foundation & Launch (Q3–Q5 2025)</h3>
-    <ul>
-      <li>Smart contract development and audits</li>
-      <li>Token Generation Event (TGE)</li>
-      <li>Initial DEX listing and liquidity provisioning</li>
-      <li>Website and whitepaper launch</li>
-      <li>Community building and marketing</li>
-    </ul>
+    <!-- Price Ticker -->
+    <div class="price-ticker">
+        <div class="container ticker-container">
+            <div class="ticker-item">
+                <img src="btc-icon.png" alt="BTC"/>
+                <div class="coin-info">
+                    <span class="symbol">BTC</span>
+                    <span class="price">$67,000</span>
+                    <span class="change positive">+2.3%</span>
+                </div>
+            </div>
+            <div class="ticker-item">
+                <img src="eth-icon.png" alt="ETH"/>
+                <div class="coin-info">
+                    <span class="symbol">ETH</span>
+                    <span class="price">$3,200</span>
+                    <span class="change negative">-0.8%</span>
+                </div>
+            </div>
+            <!-- Add more coins as needed -->
+        </div>
+    </div>
 
-    <h3>Phase 2: Ecosystem Expansion (Q1–Q3 2026)</h3>
-    <ul>
-      <li>SPK staking platform</li>
-      <li>DAO governance portal</li>
-      <li>Strategic DeFi partnerships</li>
-      <li>Cross-chain bridge research</li>
-      <li>Analytics dashboard and mobile beta</li>
-    </ul>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Trade & Earn with <span>CryptoZone</span></h1>
+                <p>Buy, sell, and stake your favorite cryptocurrencies with ease. Trusted, secure, and fast trading platform for everyone.</p>
+                <div class="cta-buttons">
+                    <button class="btn primary">Get Started</button>
+                    <button class="btn secondary">Learn More</button>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="hero-img.png" alt="Crypto Dashboard"/>
+            </div>
+        </div>
+    </section>
 
-    <h3>Phase 3: Advanced Features (Q4 2026+)</h3>
-    <ul>
-      <li>Advanced yield farming</li>
-      <li>DEX integration</li>
-      <li>Risk management & insurance</li>
-      <li>Real-world asset tokenization</li>
-      <li>Layer 2 scaling & global onboarding</li>
-    </ul>
-  </section>
+    <!-- Market Overview -->
+    <section class="market-overview" id="market">
+        <div class="container">
+            <h2>Market Overview</h2>
+            <div class="market-filters">
+                <button class="filter-btn active">All</button>
+                <button class="filter-btn">DeFi</button>
+                <button class="filter-btn">NFT</button>
+                <button class="filter-btn">Gaming</button>
+            </div>
+            <div class="market-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Coin</th>
+                            <th>Price</th>
+                            <th>24h Change</th>
+                            <th>Market Cap</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Bitcoin (BTC)</td>
+                            <td>$67,000</td>
+                            <td class="change positive">+2.3%</td>
+                            <td>$1.2T</td>
+                        </tr>
+                        <tr>
+                            <td>Ethereum (ETH)</td>
+                            <td>$3,200</td>
+                            <td class="change negative">-0.8%</td>
+                            <td>$400B</td>
+                        </tr>
+                        <!-- Add more rows as needed -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
 
-  <section id="tokenomics">
-    <h2>Token Allocation (2B Total Supply)</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Category</th>
-          <th>Percentage</th>
-          <th>Tokens</th>
-          <th>Vesting Schedule</th>
-          <th>Purpose</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>Presale</td><td>25%</td><td>500,000,000</td><td>20% TGE, 6mo cliff, 12mo linear</td><td>Early funding</td></tr>
-        <tr><td>Liquidity Pool</td><td>20%</td><td>400,000,000</td><td>50% locked 2y, 50% continuous</td><td>DEX stability</td></tr>
-        <tr><td>Team & Dev</td><td>10%</td><td>200,000,000</td><td>12mo cliff, 24mo linear</td><td>Core development</td></tr>
-        <tr><td>Staking Rewards</td><td>15%</td><td>300,000,000</td><td>48mo linear (~10.4M/mo)</td><td>User incentives</td></tr>
-        <tr><td>Ecosystem Fund</td><td>15%</td><td>300,000,000</td><td>DAO-controlled (quarterly)</td><td>Partnerships, grants</td></tr>
-        <tr><td>Marketing</td><td>8%</td><td>160,000,000</td><td>25% TGE, 18mo linear</td><td>CEX listings, ads</td></tr>
-        <tr><td>Advisors</td><td>5%</td><td>100,000,000</td><td>6mo cliff, 18mo linear</td><td>Strategic guidance</td></tr>
-        <tr><td>Airdrops</td><td>2%</td><td>40,000,000</td><td>100% at TGE</td><td>Community growth</td></tr>
-      </tbody>
-    </table>
-  </section>
+    <!-- Features -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2>Why Choose Us</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="icon"><i class="fas fa-shield-alt"></i></div>
+                    <h3>Secure</h3>
+                    <p>Top-tier security protocols keep your assets safe at all times.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon"><i class="fas fa-tachometer-alt"></i></div>
+                    <h3>Fast Transactions</h3>
+                    <p>Experience lightning-fast transactions with minimal fees.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon"><i class="fas fa-chart-line"></i></div>
+                    <h3>Analytics</h3>
+                    <p>Gain powerful insights with real-time charts and data tracking.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-  <footer>
-    <p>© 2025 Splufik. Built on TON Blockchain.</p>
-  </footer>
+    <!-- Newsletter -->
+    <section class="newsletter" id="newsletter">
+        <div class="container">
+            <h2>Stay Updated</h2>
+            <p>Subscribe to our newsletter to get the latest updates and market insights.</p>
+            <form class="newsletter-form">
+                <input type="email" placeholder="Enter your email" required />
+                <button class="btn primary" type="submit">Subscribe</button>
+            </form>
+        </div>
+    </section>
 
-  <script type="module">
-    import { TonConnectUI } from "https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js";
-    const tonConnectUI = new TonConnectUI({
-      manifestUrl: 'https://spk-presale.vercel.app/tonconnect-manifest.json',
-      buttonRootId: 'connect-button'
-    });
-  </script>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>Company</h3>
+                    <ul>
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Press</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Products</h3>
+                    <ul>
+                        <li><a href="#">Exchange</a></li>
+                        <li><a href="#">Wallet</a></li>
+                        <li><a href="#">Staking</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Support</h3>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">FAQs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Follow Us</h3>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-telegram"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; 2025 CryptoZone. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
 </body>
 </html>
