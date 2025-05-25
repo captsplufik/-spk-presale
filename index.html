@@ -1,172 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPK Token Presale</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-    <style>
-        :root {
-            --primary: #6C4DF6;
-            --primary-dark: #5A3FDC;
-            --secondary: #00C4FF;
-            --accent: #FF7043;
-            --dark: #1E1E2D;
-            --light: #F8FAFC;
-            --gray: #94A3B8;
-            --card-bg: #FFFFFF;
-            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+<!-- In HEAD -->
+<script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+
+<!-- In BODY (where you want the button) -->
+<div id="ton-connect" class="ton-connect-btn"></div>
+
+<!-- Before </body> -->
+<script>
+  // Initialize with your manifest
+  const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+    manifestUrl: "https://raw.githubusercontent.com/yourusername/yourrepo/main/tonconnect-manifest.json",
+    buttonRootId: "ton-connect",
+    language: 'en',
+    uiPreferences: {
+      theme: 'DARK',
+      colors: {
+        light: {
+          connectButton: {
+            background: '#6C4DF6',
+            text: '#FFFFFF'
+          }
         }
+      }
+    }
+  });
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  // Enhanced connection handler
+  tonConnectUI.onStatusChange((wallet) => {
+    const btn = document.querySelector('.presale-form button');
+    if (wallet) {
+      console.log("Connected to:", wallet.device.appName);
+      btn.disabled = false;
+      btn.classList.add('connected');
+    } else {
+      btn.disabled = true;
+      btn.classList.remove('connected');
+    }
+  });
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--light);
-            color: var(--dark);
-            line-height: 1.6;
-        }
-
-        /* TON Connect Button Styling */
-        #ton-connect {
-            margin: 20px auto;
-            max-width: 300px;
-        }
-
-        /* ... (keep all your existing CSS styles) ... */
-
-        @media (max-width: 768px) {
-            #ton-connect {
-                width: 100%;
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- Header -->
-    <header>
-        <div class="container header-container">
-            <a href="#" class="logo">SPK</a>
-            <nav class="nav-links">
-                <a href="#presale">Presale</a>
-                <a href="#tokenomics">Tokenomics</a>
-                <a href="#roadmap">Roadmap</a>
-                <a href="#faq">FAQ</a>
-            </nav>
-            <div id="ton-connect"></div>
-        </div>
-    </header>
-
-    <!-- Presale Section -->
-    <section id="presale" class="presale-section">
-        <div class="container">
-            <h2 class="section-title">Token Presale</h2>
-            <div class="presale-card">
-                <!-- Countdown, progress bar, etc. -->
-                <div id="ton-connect" class="my-4"></div>
-                
-                <div class="presale-form">
-                    <div class="input-group">
-                        <label for="presaleAmount">Amount</label>
-                        <input type="number" id="presaleAmount" placeholder="1 to 500 TON" min="1" max="500">
-                    </div>
-                    <button class="btn btn-primary" disabled id="contribute-btn">
-                        Connect Wallet to Contribute
-                    </button>
-                    <p class="token-price">1 TON = <span>20 SPK</span></p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ... (keep other sections: tokenomics, roadmap, etc.) ... -->
-
-    <script>
-        // Initialize TON Connect
-        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: "https://spk-presale-git-main-captsplufiks-projects.vercel.app/tonconnect-manifest.json",
-            buttonRootId: "ton-connect",
-            language: 'en',
-            uiPreferences: {
-                theme: 'DARK',
-                colors: {
-                    light: {
-                        connectButton: {
-                            background: '#6C4DF6',
-                            text: '#FFFFFF'
-                        }
-                    }
-                }
-            }
-        });
-
-        // Handle wallet connection changes
-        tonConnectUI.onStatusChange((wallet) => {
-            const btn = document.getElementById('contribute-btn');
-            if (wallet) {
-                const shortAddress = `${wallet.account.address.slice(0, 4)}...${wallet.account.address.slice(-4)}`;
-                btn.textContent = `Contribute (${shortAddress})`;
-                btn.disabled = false;
-                btn.classList.add('connected');
-            } else {
-                btn.textContent = 'Connect Wallet to Contribute';
-                btn.disabled = true;
-                btn.classList.remove('connected');
-            }
-        });
-
-        // Handle contribution
-        document.getElementById('contribute-btn').addEventListener('click', async (e) => {
-            e.preventDefault();
-            
-            const amount = parseFloat(document.getElementById('presaleAmount').value);
-            if (!amount || amount < 1 || amount > 500) {
-                alert('Please enter a valid amount between 1 and 500 TON');
-                return;
-            }
-
-            try {
-                e.target.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-                e.target.disabled = true;
-                
-                // Replace with your actual contract interaction
-                const tx = {
-                    validUntil: Math.floor(Date.now() / 1000) + 300, // 5 minutes
-                    messages: [
-                        {
-                            address: "EQABC...YOUR_CONTRACT_ADDRESS",
-                            amount: (amount * 1e9).toString(), // Convert to nanoTON
-                            payload: "te6cckEBAQEAAgAAAEysuc0=" // Base64-encoded comment
-                        }
-                    ]
-                };
-                
-                const result = await tonConnectUI.sendTransaction(tx);
-                alert(`Success! TX Hash: ${result.boc}`);
-                
-            } catch (error) {
-                console.error("Transaction failed:", error);
-                alert("Transaction failed: " + error.message);
-            } finally {
-                const wallet = await tonConnectUI.connectionRestored;
-                const btn = document.getElementById('contribute-btn');
-                if (wallet) {
-                    const shortAddress = `${wallet.account.address.slice(0, 4)}...${wallet.account.address.slice(-4)}`;
-                    btn.textContent = `Contribute (${shortAddress})`;
-                } else {
-                    btn.textContent = 'Connect Wallet to Contribute';
-                }
-                btn.disabled = false;
-            }
-        });
-
-        // ... (keep your existing countdown and progress bar code) ...
-    </script>
-</body>
-</html>
+  // Error handling
+  tonConnectUI.onError((error) => {
+    console.error("TON Connection Error:", error);
+    alert("Wallet connection error. Please try again.");
+  });
+</script>
