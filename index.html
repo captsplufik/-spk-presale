@@ -5,7 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SPK Token Presale</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" hr<!-- Error Modal -->
+<div id="error-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h3><i class="fas fa-exclamation-circle"></i> Connection Error</h3>
+    <p id="error-message"></p>
+    <div class="modal-actions">
+      <button id="retry-btn" class="btn btn-primary">Retry</button>
+      <button id="cancel-btn" class="btn btn-outline">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Indicator -->
+<div id="loading-indicator" class="loading">
+  <div class="loader"></div>
+  <p>Connecting to wallet...</p>
+</div>ef="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
 
