@@ -80,6 +80,27 @@
             color: var(--primary);
         }
 
+        /* TON Connection Styles */
+        #ton-connection {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
+        }
+
+        .wallet-status {
+            font-size: 14px;
+            margin-top: 5px;
+            font-weight: 500;
+            text-align: right;
+            color: var(--gray);
+            transition: all 0.3s ease;
+        }
+
+        .wallet-status.connected {
+            color: var(--primary);
+        }
+
         /* Hero Section */
         .hero {
             padding: 120px 0 80px;
@@ -273,11 +294,41 @@
             font-weight: 600;
         }
 
-        /* TON Connect Button */
-        #ton-connect {
-            margin: 20px 0;
+        /* Error Message Styles */
+        .error-message {
+            background: #FFF0F0;
+            color: #FF4444;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
             display: flex;
-            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            animation: fadeIn 0.3s ease;
+            border: 1px solid rgba(255, 68, 68, 0.2);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Button States */
+        #contribute-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        #contribute-btn .fa-spinner {
+            margin-right: 8px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* Tokenomics Section */
@@ -379,6 +430,20 @@
                 display: none;
             }
             
+            .header-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            #ton-connection {
+                align-items: center;
+                width: 100%;
+            }
+            
+            .wallet-status {
+                text-align: center;
+            }
+            
             .hero h1 {
                 font-size: 36px;
             }
@@ -405,6 +470,10 @@
             .presale-card {
                 padding: 25px;
             }
+            
+            .wallet-status {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -421,6 +490,7 @@
             </nav>
             <div id="ton-connection">
                 <div id="ton-connect"></div>
+                <div id="wallet-status" class="wallet-status">Not Connected</div>
             </div>
         </div>
     </header>
@@ -479,7 +549,7 @@
                         <label for="presaleAmount">Amount</label>
                         <input type="number" id="presaleAmount" placeholder="1 to 500 TON" min="1" max="500">
                     </div>
-                    <button class="btn btn-primary">Contribute Now</button>
+                    <button class="btn btn-primary" id="contribute-btn">Contribute Now</button>
                     <p class="token-price">1 TON = <span>20 SPK</span></p>
                 </div>
             </div>
@@ -570,6 +640,21 @@
             buttonRootId: "ton-connect"
         });
 
+        // Handle wallet connection changes
+        tonConnectUI.onStatusChange((wallet) => {
+            const walletStatus = document.getElementById('wallet-status');
+            if (wallet) {
+                const shortAddress = `${wallet.account.address.slice(0, 6)}...${wallet.account.address.slice(-4)}`;
+                walletStatus.textContent = `Connected: ${shortAddress}`;
+                walletStatus.classList.add('connected');
+                document.getElementById('contribute-btn').disabled = false;
+            } else {
+                walletStatus.textContent = 'Not Connected';
+                walletStatus.classList.remove('connected');
+                document.getElementById('contribute-btn').disabled = true;
+            }
+        });
+
         // Enhanced Countdown Timer
         function updateCountdown() {
             const launchDate = new Date('2025-06-30T00:00:00').getTime();
@@ -635,18 +720,40 @@
         });
 
         // Add form submission handler
-        document.querySelector('.presale-form button').addEventListener('click', (e) => {
+        document.getElementById('contribute-btn').addEventListener('click', (e) => {
             e.preventDefault();
             const amount = parseFloat(document.getElementById('presaleAmount').value);
             
             if (!amount || amount < 1 || amount > 500) {
-                alert('Please enter a valid amount between 1 and 500 TON');
+                showError('Please enter a valid amount between 1 and 500 TON');
                 return;
             }
             
             // Here you would add your actual contribution logic
             alert(`Contribution of ${amount} TON received! Thank you.`);
         });
+
+        // Error display function
+        function showError(message) {
+            // Remove existing errors first
+            const existingError = document.querySelector('.error-message');
+            if (existingError) existingError.remove();
+            
+            // Create error element
+            const errorElement = document.createElement('div');
+            errorElement.className = 'error-message';
+            errorElement.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+            
+            // Insert after progress container
+            const progressContainer = document.querySelector('.progress-container');
+            progressContainer.parentNode.insertBefore(errorElement, progressContainer.nextSibling);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                errorElement.classList.add('fade-out');
+                setTimeout(() => errorElement.remove(), 300);
+            }, 5000);
+        }
     </script>
 </body>
 </html>
