@@ -636,14 +636,12 @@
     <script>
         // Initialize TON Connect UI
        <script>
-  document.addEventListener("DOMContentLoaded", () => {
+  <script>
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-      manifestUrl: "https://spk-presale.vercel.app/tonconnect-manifest.json",
-      buttonRootId: "ton-connect"
+        manifestUrl: "https://spk-presale.vercel.app/tonconnect-manifest.json",
+        buttonRootId: "ton-connect"
   });
 </script>
-        });
-
         // Handle wallet connection changes
         tonConnectUI.onStatusChange((wallet) => {
             const walletStatus = document.getElementById('wallet-status');
