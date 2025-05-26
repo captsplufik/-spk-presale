@@ -6,8 +6,8 @@
     <title>SPK Token Presale</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
 
     <style>
         :root {
@@ -80,7 +80,7 @@
             color: var(--primary);
         }
 
-        /* TON Connection Styles */
+        /* TON Connection */
         #ton-connection {
             display: flex;
             flex-direction: column;
@@ -91,14 +91,13 @@
         .wallet-status {
             font-size: 14px;
             margin-top: 5px;
-            font-weight: 500;
-            text-align: right;
             color: var(--gray);
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
 
         .wallet-status.connected {
             color: var(--primary);
+            font-weight: 500;
         }
 
         /* Hero Section */
@@ -503,7 +502,7 @@
                 <p>Participate in the future of decentralized finance with SPK Token - the next generation utility token on TON blockchain.</p>
                 <div class="cta-buttons">
                     <a href="#presale" class="btn btn-primary">Join Presale</a>
-                    <a href="whitepaper.html" class="btn btn-outline" target="_blank">Whitepaper</a>
+                    <a href="https://spk-presale-git-main-captsplufiks-projects.vercel.app/tonconnect-manifest.json" class="btn btn-outline" target="_blank">Whitepaper</a>
                 </div>
             </div>
             <div class="hero-image">
@@ -627,37 +626,158 @@
 
     <!-- FAQ Section -->
     <section id="faq" class="faq-section">
-        <div class="container">,
+        <div class="container">
             <h2 class="section-title">Frequently Asked Questions</h2>
             <!-- FAQ content here -->
         </div>
     </section>
 
     <script>
-        // Initialize TON Connect UI
-       <script>
-  <script>
-    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-        manifestUrl: "https://spk-presale.vercel.app/tonconnect-manifest.json",
-        buttonRootId: "ton-connect"
-  });
-</script>
-        // Handle wallet connection changes
-        tonConnectUI.onStatusChange((wallet) => {
-            const walletStatus = document.getElementById('wallet-status');
-            if (wallet) {
-                const shortAddress = `${wallet.account.address.slice(0, 6)}...${wallet.account.address.slice(-4)}`;
-                walletStatus.textContent = `Connected: ${shortAddress}`;
-                walletStatus.classList.add('connected');
-                document.getElementById('contribute-btn').disabled = false;
-            } else {
-                walletStatus.textContent = 'Not Connected';
-                walletStatus.classList.remove('connected');
-                document.getElementById('contribute-btn').disabled = true;
+        // Configuration
+        const config = {
+            manifestUrl: "https://spk-presale-git-main-captsplufiks-projects.vercel.app/tonconnect-manifest.json",
+            buttonRootId: "ton-connect",
+            chain: 'mainnet'
+        };
+
+        // Initialize TON Connect with error handling
+        async function initTonConnect() {
+            try {
+                // First try with the actual manifest
+                const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+                    manifestUrl: config.manifestUrl,
+                    buttonRootId: config.buttonRootId,
+                    language: 'en',
+                    uiPreferences: {
+                        theme: 'DARK',
+                        colors: {
+                            light: {
+                                connectButton: {
+                                    background: '#6C4DF6',
+                                    text: '#FFFFFF'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Fallback if manifest loading fails
+                tonConnectUI.onError(async (error) => {
+                    if (error.message.includes('Manifest')) {
+                        console.warn('Using fallback manifest');
+                        const fallbackManifest = {
+                            url: window.location.href,
+                            name: "SPK Token Presale",
+                            iconUrl: "https://via.placeholder.com/256/6C4DF6/FFFFFF?text=SPK",
+                            termsOfUseUrl: window.location.href,
+                            privacyPolicyUrl: window.location.href
+                        };
+                        
+                        const blob = new Blob([JSON.stringify(fallbackManifest)], { type: 'application/json' });
+                        const fallbackUrl = URL.createObjectURL(blob);
+                        
+                        // Reinitialize with fallback
+                        return new TON_CONNECT_UI.TonConnectUI({
+                            manifestUrl: fallbackUrl,
+                            buttonRootId: config.buttonRootId,
+                            language: 'en',
+                            uiPreferences: {
+                                theme: 'DARK',
+                                colors: {
+                                    light: {
+                                        connectButton: {
+                                            background: '#6C4DF6',
+                                            text: '#FFFFFF'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    throw error;
+                });
+
+                return tonConnectUI;
+            } catch (error) {
+                console.error('TON Connect initialization failed:', error);
+                showError('Wallet Connection', 'Failed to initialize wallet system. Please try again later.');
+                throw error;
+            }
+        }
+
+        // Initialize when DOM loads
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const tonConnectUI = await initTonConnect();
+                
+                // Handle wallet connection changes
+                tonConnectUI.onStatusChange((wallet) => {
+                    const btn = document.getElementById('contribute-btn');
+                    const walletStatus = document.getElementById('wallet-status');
+                    
+                    if (wallet) {
+                        try {
+                            const shortAddress = `${wallet.account.address.slice(0, 6)}...${wallet.account.address.slice(-4)}`;
+                            btn.innerHTML = '<i class="fas fa-wallet"></i> Contribute';
+                            btn.disabled = false;
+                            walletStatus.textContent = `Connected: ${shortAddress}`;
+                            walletStatus.classList.add('connected');
+                            
+                            if (wallet.account.chain !== config.chain) {
+                                showWarning(`Please switch to ${config.chain} in your wallet`);
+                            }
+                            
+                        } catch (error) {
+                            console.error("Connection processing error:", error);
+                            walletStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
+                            showError("Connection Error", "Failed to process wallet connection");
+                        }
+                    } else {
+                        btn.innerHTML = '<i class="fas fa-wallet"></i> Connect Wallet';
+                        btn.disabled = true;
+                        walletStatus.textContent = 'Not Connected';
+                        walletStatus.classList.remove('connected');
+                    }
+                });
+
+                // Error handling
+                tonConnectUI.onError((error) => {
+                    console.error("TON Connection Error:", error);
+                    const walletStatus = document.getElementById('wallet-status');
+                    walletStatus.innerHTML = '<i class="fas fa-exclamation-circle"></i> Connection Failed';
+                    
+                    if (error.message.includes("Manifest")) {
+                        showError("Configuration Error", `
+                            Failed to load wallet configuration. 
+                            <a href="javascript:location.reload()">Refresh page</a> or try again later.
+                        `);
+                    } else {
+                        showError("Connection Error", error.message);
+                    }
+                });
+
+                // Check existing connection
+                tonConnectUI.connectionRestored.then((wallet) => {
+                    if (wallet) console.log("Restored existing connection");
+                }).catch((error) => {
+                    console.log("No existing connection found");
+                });
+
+                // Initialize countdown
+                updateCountdown();
+                setInterval(updateCountdown, 1000);
+
+                // Initialize progress bar
+                setTimeout(() => {
+                    document.getElementById('presaleProgress').style.width = '25%';
+                }, 500);
+
+            } catch (error) {
+                console.error('Initialization error:', error);
             }
         });
 
-        // Enhanced Countdown Timer
+        // Countdown Timer
         function updateCountdown() {
             const launchDate = new Date('2025-06-30T00:00:00').getTime();
             const now = new Date().getTime();
@@ -679,26 +799,7 @@
             document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
         }
 
-        // Initialize countdown immediately and update every second
-        updateCountdown();
-        setInterval(updateCountdown, 1000);
-
-        // Dynamic Progress Bar Calculation
-        document.addEventListener('DOMContentLoaded', () => {
-            const raised = 1250000; // Current raised amount
-            const target = 5000000; // Target amount
-            const progressPercent = Math.min((raised / target) * 100, 100);
-            
-            setTimeout(() => {
-                document.getElementById('presaleProgress').style.width = `${progressPercent}%`;
-            }, 500);
-            
-            // Update the raised amount display
-            document.querySelector('.progress-label span:first-child strong').textContent = 
-                `$${raised.toLocaleString()}`;
-        });
-
-        // Enhanced Contribution Validation
+        // Contribution Validation
         document.getElementById('presaleAmount').addEventListener('input', (e) => {
             let value = parseFloat(e.target.value);
             
@@ -707,7 +808,6 @@
                 return;
             }
             
-            // Enforce min/max with better UX
             if (value < 1) {
                 e.target.value = 1;
                 value = 1;
@@ -716,44 +816,62 @@
                 value = 500;
             }
             
-            // Calculate and display token amount
-            const tokenAmount = value * 20; // 1 TON = 20 SPK
+            const tokenAmount = value * 20;
             document.querySelector('.token-price span').textContent = `${tokenAmount.toLocaleString()} SPK`;
         });
 
-        // Add form submission handler
+        // Form Submission
         document.getElementById('contribute-btn').addEventListener('click', (e) => {
             e.preventDefault();
             const amount = parseFloat(document.getElementById('presaleAmount').value);
             
             if (!amount || amount < 1 || amount > 500) {
-                showError('Please enter a valid amount between 1 and 500 TON');
+                showError('Invalid Amount', 'Please enter between 1-500 TON');
                 return;
             }
             
-            // Here you would add your actual contribution logic
-            alert(`Contribution of ${amount} TON received! Thank you.`);
+            alert(`Contribution of ${amount} TON would be processed here`);
         });
 
-        // Error display function
-        function showError(message) {
-            // Remove existing errors first
-            const existingError = document.querySelector('.error-message');
-            if (existingError) existingError.remove();
-            
-            // Create error element
+        // Helper functions
+        function showError(title, message) {
             const errorElement = document.createElement('div');
             errorElement.className = 'error-message';
-            errorElement.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+            errorElement.innerHTML = `
+                <i class="fas fa-exclamation-circle"></i>
+                <strong>${title}:</strong> ${message}
+            `;
             
-            // Insert after progress container
-            const progressContainer = document.querySelector('.progress-container');
-            progressContainer.parentNode.insertBefore(errorElement, progressContainer.nextSibling);
+            const presaleCard = document.querySelector('.presale-card');
+            const existingError = presaleCard.querySelector('.error-message');
+            if (existingError) existingError.remove();
             
-            // Auto-remove after 5 seconds
+            presaleCard.prepend(errorElement);
             setTimeout(() => {
                 errorElement.classList.add('fade-out');
                 setTimeout(() => errorElement.remove(), 300);
+            }, 5000);
+        }
+
+        function showWarning(message) {
+            const warningElement = document.createElement('div');
+            warningElement.className = 'error-message';
+            warningElement.style.background = '#FFF8E6';
+            warningElement.style.color = '#E6A700';
+            warningElement.style.borderColor = 'rgba(230, 167, 0, 0.2)';
+            warningElement.innerHTML = `
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Warning:</strong> ${message}
+            `;
+            
+            const presaleCard = document.querySelector('.presale-card');
+            const existingWarning = presaleCard.querySelector('.error-message');
+            if (existingWarning) existingWarning.remove();
+            
+            presaleCard.prepend(warningElement);
+            setTimeout(() => {
+                warningElement.classList.add('fade-out');
+                setTimeout(() => warningElement.remove(), 300);
             }, 5000);
         }
     </script>
