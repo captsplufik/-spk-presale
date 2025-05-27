@@ -170,6 +170,28 @@
             transform: translateY(-2px);
         }
 
+        /* Countdown Banner */
+        .countdown-banner {
+            text-align: center;
+            margin: 2rem 0;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .countdown-banner h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .countdown-banner #countdown {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
         /* Presale Section */
         .presale-section {
             padding: 80px 0;
@@ -408,26 +430,6 @@
             color: var(--gray);
         }
 
-        /* Countdown Banner */
-        .countdown-banner {
-            text-align: center;
-            margin: 2rem 0;
-            padding: 1rem;
-        }
-
-        .countdown-banner h2 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--dark);
-        }
-
-        .countdown-banner #countdown {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
         /* Responsive */
         @media (max-width: 992px) {
             .hero-content {
@@ -540,12 +542,12 @@
     </section>
 
     <!-- Countdown Banner -->
-    <section class="countdown-banner">
-        <div class="container">
+    <div class="container">
+        <div class="countdown-banner">
             <h2>Presale Launches In:</h2>
             <div id="countdown">Loading...</div>
         </div>
-    </section>
+    </div>
 
     <!-- Presale Section -->
     <section id="presale" class="presale-section">
@@ -799,9 +801,9 @@
                     console.log("No existing connection found");
                 });
 
-                // Initialize countdown
-                updateCountdown();
-                setInterval(updateCountdown, 1000);
+                // Initialize countdown from current time
+                updateCountdownFromNow();
+                setInterval(updateCountdownFromNow, 1000);
 
                 // Initialize progress bar
                 setTimeout(() => {
@@ -813,13 +815,14 @@
             }
         });
 
-        // Countdown Timer
-        function updateCountdown() {
-            const launchDate = new Date('2025-06-30T00:00:00').getTime();
+        // Countdown Timer counting from NOW to launch date
+        function updateCountdownFromNow() {
+            const launchDate = new Date('2025-06-15T00:00:00Z').getTime(); // June 15, 2025 in UTC
             const now = new Date().getTime();
             const diff = launchDate - now;
             
             if (diff <= 0) {
+                // Presale has launched
                 document.getElementById('days').textContent = '00';
                 document.getElementById('hours').textContent = '00';
                 document.getElementById('minutes').textContent = '00';
@@ -827,11 +830,13 @@
                 return;
             }
             
+            // Calculate time units
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
             const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
             
+            // Update both countdown displays
             document.getElementById('days').textContent = days.toString().padStart(2, '0');
             document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
             document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
