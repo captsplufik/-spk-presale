@@ -6,16 +6,8 @@
     <title>SPK Token Presale</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js">
-        // Initialize countdown outside DOMContentLoaded to ensure elements exist
-        setInterval(updateCountdownFromNow, 1000);
-        updateCountdownFromNow();
-    </script>
-    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js">
-        // Initialize countdown outside DOMContentLoaded to ensure elements exist
-        setInterval(updateCountdownFromNow, 1000);
-        updateCountdownFromNow();
-    </script>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
 
     <style>
         :root {
@@ -88,26 +80,6 @@
             color: var(--primary);
         }
 
-        /* TON Connection */
-        #ton-connection {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 5px;
-        }
-
-        .wallet-status {
-            font-size: 14px;
-            margin-top: 5px;
-            color: var(--gray);
-            transition: all 0.3s;
-        }
-
-        .wallet-status.connected {
-            color: var(--primary);
-            font-weight: 500;
-        }
-
         /* Hero Section */
         .hero {
             padding: 120px 0 80px;
@@ -176,28 +148,6 @@
         .btn-outline:hover {
             background: rgba(108, 77, 246, 0.1);
             transform: translateY(-2px);
-        }
-
-        /* Countdown Banner */
-        .countdown-banner {
-            text-align: center;
-            margin: 2rem 0;
-            padding: 1rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            border-radius: 8px;
-            box-shadow: var(--card-shadow);
-        }
-
-        .countdown-banner h2 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .countdown-banner #countdown {
-            font-size: 2rem;
-            font-weight: 700;
         }
 
         /* Presale Section */
@@ -323,41 +273,11 @@
             font-weight: 600;
         }
 
-        /* Error Message Styles */
-        .error-message {
-            background: #FFF0F0;
-            color: #FF4444;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+        /* TON Connect Button */
+        #ton-connect {
+            margin: 20px 0;
             display: flex;
-            align-items: center;
-            gap: 8px;
-            animation: fadeIn 0.3s ease;
-            border: 1px solid rgba(255, 68, 68, 0.2);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Button States */
-        #contribute-btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none !important;
-            box-shadow: none !important;
-        }
-
-        #contribute-btn .fa-spinner {
-            margin-right: 8px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            justify-content: center;
         }
 
         /* Tokenomics Section */
@@ -459,20 +379,6 @@
                 display: none;
             }
             
-            .header-container {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            #ton-connection {
-                align-items: center;
-                width: 100%;
-            }
-            
-            .wallet-status {
-                text-align: center;
-            }
-            
             .hero h1 {
                 font-size: 36px;
             }
@@ -483,14 +389,6 @@
             
             .countdown-item span {
                 font-size: 32px;
-            }
-
-            .countdown-banner h2 {
-                font-size: 1.25rem;
-            }
-
-            .countdown-banner #countdown {
-                font-size: 1.5rem;
             }
         }
 
@@ -506,10 +404,6 @@
             
             .presale-card {
                 padding: 25px;
-            }
-            
-            .wallet-status {
-                font-size: 12px;
             }
         }
     </style>
@@ -527,7 +421,6 @@
             </nav>
             <div id="ton-connection">
                 <div id="ton-connect"></div>
-                <div id="wallet-status" class="wallet-status">Not Connected</div>
             </div>
         </div>
     </header>
@@ -540,7 +433,7 @@
                 <p>Participate in the future of decentralized finance with SPK Token - the next generation utility token on TON blockchain.</p>
                 <div class="cta-buttons">
                     <a href="#presale" class="btn btn-primary">Join Presale</a>
-                    <a href="https://spk-presale-git-main-captsplufiks-projects.vercel.app/tonconnect-manifest.json" class="btn btn-outline" target="_blank">Whitepaper</a>
+                    <a href="#whitepaper" class="btn btn-outline">Whitepaper</a>
                 </div>
             </div>
             <div class="hero-image">
@@ -548,14 +441,6 @@
             </div>
         </div>
     </section>
-
-    <!-- Countdown Banner -->
-    <div class="container">
-        <div class="countdown-banner">
-            <h2>Presale Launches In:</h2>
-            <div id="countdown">Loading...</div>
-        </div>
-    </div>
 
     <!-- Presale Section -->
     <section id="presale" class="presale-section">
@@ -594,7 +479,7 @@
                         <label for="presaleAmount">Amount</label>
                         <input type="number" id="presaleAmount" placeholder="1 to 500 TON" min="1" max="500">
                     </div>
-                    <button class="btn btn-primary" id="contribute-btn">Contribute Now</button>
+                    <button class="btn btn-primary">Contribute Now</button>
                     <p class="token-price">1 TON = <span>20 SPK</span></p>
                 </div>
             </div>
@@ -679,176 +564,54 @@
     </section>
 
     <script>
-        // Configuration
-        const config = {
-            manifestUrl: "https://spk-presale-git-main-captsplufiks-projects.vercel.app/tonconnect-manifest.json",
-            buttonRootId: "ton-connect",
-            chain: 'mainnet'
-        };
-
-        // Initialize TON Connect with error handling
-        async function initTonConnect() {
-            try {
-                // First try with the actual manifest
-                const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-                    manifestUrl: config.manifestUrl,
-                    buttonRootId: config.buttonRootId,
-                    language: 'en',
-                    uiPreferences: {
-                        theme: 'DARK',
-                        colors: {
-                            light: {
-                                connectButton: {
-                                    background: '#6C4DF6',
-                                    text: '#FFFFFF'
-                                }
-                            }
-                        }
-                    }
-                });
-
-                // Fallback if manifest loading fails
-                tonConnectUI.onError(async (error) => {
-                    if (error.message.includes('Manifest')) {
-                        console.warn('Using fallback manifest');
-                        const fallbackManifest = {
-                            url: window.location.href,
-                            name: "SPK Token Presale",
-                            iconUrl: "https://via.placeholder.com/256/6C4DF6/FFFFFF?text=SPK",
-                            termsOfUseUrl: window.location.href,
-                            privacyPolicyUrl: window.location.href
-                        };
-                        
-                        const blob = new Blob([JSON.stringify(fallbackManifest)], { type: 'application/json' });
-                        const fallbackUrl = URL.createObjectURL(blob);
-                        
-                        // Reinitialize with fallback
-                        return new TON_CONNECT_UI.TonConnectUI({
-                            manifestUrl: fallbackUrl,
-                            buttonRootId: config.buttonRootId,
-                            language: 'en',
-                            uiPreferences: {
-                                theme: 'DARK',
-                                colors: {
-                                    light: {
-                                        connectButton: {
-                                            background: '#6C4DF6',
-                                            text: '#FFFFFF'
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    }
-                    throw error;
-                });
-
-                return tonConnectUI;
-            } catch (error) {
-                console.error('TON Connect initialization failed:', error);
-                showError('Wallet Connection', 'Failed to initialize wallet system. Please try again later.');
-                throw error;
-            }
-        }
-
-        // Initialize when DOM loads
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                const tonConnectUI = await initTonConnect();
-                
-                // Handle wallet connection changes
-                tonConnectUI.onStatusChange((wallet) => {
-                    const btn = document.getElementById('contribute-btn');
-                    const walletStatus = document.getElementById('wallet-status');
-                    
-                    if (wallet) {
-                        try {
-                            const shortAddress = `${wallet.account.address.slice(0, 6)}...${wallet.account.address.slice(-4)}`;
-                            btn.innerHTML = '<i class="fas fa-wallet"></i> Contribute';
-                            btn.disabled = false;
-                            walletStatus.textContent = `Connected: ${shortAddress}`;
-                            walletStatus.classList.add('connected');
-                            
-                            if (wallet.account.chain !== config.chain) {
-                                showWarning(`Please switch to ${config.chain} in your wallet`);
-                            }
-                            
-                        } catch (error) {
-                            console.error("Connection processing error:", error);
-                            walletStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
-                            showError("Connection Error", "Failed to process wallet connection");
-                        }
-                    } else {
-                        btn.innerHTML = '<i class="fas fa-wallet"></i> Connect Wallet';
-                        btn.disabled = true;
-                        walletStatus.textContent = 'Not Connected';
-                        walletStatus.classList.remove('connected');
-                    }
-                });
-
-                // Error handling
-                tonConnectUI.onError((error) => {
-                    console.error("TON Connection Error:", error);
-                    const walletStatus = document.getElementById('wallet-status');
-                    walletStatus.innerHTML = '<i class="fas fa-exclamation-circle"></i> Connection Failed';
-                    
-                    if (error.message.includes("Manifest")) {
-                        showError("Configuration Error", `
-                            Failed to load wallet configuration. 
-                            <a href="javascript:location.reload()">Refresh page</a> or try again later.
-                        `);
-                    } else {
-                        showError("Connection Error", error.message);
-                    }
-                });
-
-                // Check existing connection
-                tonConnectUI.connectionRestored.then((wallet) => {
-                    if (wallet) console.log("Restored existing connection");
-                }).catch((error) => {
-                    console.log("No existing connection found");
-                });
-
-
-                // Initialize progress bar
-                setTimeout(() => {
-                    document.getElementById('presaleProgress').style.width = '25%';
-                }, 500);
-
-            } catch (error) {
-                console.error('Initialization error:', error);
-            }
+        // Initialize TON Connect UI
+        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: "https://yourdomain.com/tonconnect-manifest.json",
+            buttonRootId: "ton-connect"
         });
 
-        // Countdown Timer counting from NOW to launch date
-        function updateCountdownFromNow() {
-            const launchDate = new Date('2025-06-15T00:00:00Z').getTime(); // June 15, 2025 in UTC
+        // Enhanced Countdown Timer
+        function updateCountdown() {
+            const launchDate = new Date('2025-06-30T00:00:00').getTime();
             const now = new Date().getTime();
             const diff = launchDate - now;
             
             if (diff <= 0) {
-                // Presale has launched
                 document.getElementById('days').textContent = '00';
                 document.getElementById('hours').textContent = '00';
                 document.getElementById('minutes').textContent = '00';
-                document.getElementById('countdown').textContent = '🎉 Presale is Live!';
                 return;
             }
             
-            // Calculate time units
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
             const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
             
-            // Update both countdown displays
             document.getElementById('days').textContent = days.toString().padStart(2, '0');
             document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
             document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-            document.getElementById('countdown').textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
         }
 
-        // Contribution Validation
+        // Initialize countdown immediately and update every second
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+        // Dynamic Progress Bar Calculation
+        document.addEventListener('DOMContentLoaded', () => {
+            const raised = 1250000; // Current raised amount
+            const target = 5000000; // Target amount
+            const progressPercent = Math.min((raised / target) * 100, 100);
+            
+            setTimeout(() => {
+                document.getElementById('presaleProgress').style.width = `${progressPercent}%`;
+            }, 500);
+            
+            // Update the raised amount display
+            document.querySelector('.progress-label span:first-child strong').textContent = 
+                `$${raised.toLocaleString()}`;
+        });
+
+        // Enhanced Contribution Validation
         document.getElementById('presaleAmount').addEventListener('input', (e) => {
             let value = parseFloat(e.target.value);
             
@@ -857,6 +620,7 @@
                 return;
             }
             
+            // Enforce min/max with better UX
             if (value < 1) {
                 e.target.value = 1;
                 value = 1;
@@ -865,68 +629,24 @@
                 value = 500;
             }
             
-            const tokenAmount = value * 20;
+            // Calculate and display token amount
+            const tokenAmount = value * 20; // 1 TON = 20 SPK
             document.querySelector('.token-price span').textContent = `${tokenAmount.toLocaleString()} SPK`;
         });
 
-        // Form Submission
-        document.getElementById('contribute-btn').addEventListener('click', (e) => {
+        // Add form submission handler
+        document.querySelector('.presale-form button').addEventListener('click', (e) => {
             e.preventDefault();
             const amount = parseFloat(document.getElementById('presaleAmount').value);
             
             if (!amount || amount < 1 || amount > 500) {
-                showError('Invalid Amount', 'Please enter between 1-500 TON');
+                alert('Please enter a valid amount between 1 and 500 TON');
                 return;
             }
             
-            alert(`Contribution of ${amount} TON would be processed here`);
+            // Here you would add your actual contribution logic
+            alert(`Contribution of ${amount} TON received! Thank you.`);
         });
-
-        // Helper functions
-        function showError(title, message) {
-            const errorElement = document.createElement('div');
-            errorElement.className = 'error-message';
-            errorElement.innerHTML = `
-                <i class="fas fa-exclamation-circle"></i>
-                <strong>${title}:</strong> ${message}
-            `;
-            
-            const presaleCard = document.querySelector('.presale-card');
-            const existingError = presaleCard.querySelector('.error-message');
-            if (existingError) existingError.remove();
-            
-            presaleCard.prepend(errorElement);
-            setTimeout(() => {
-                errorElement.classList.add('fade-out');
-                setTimeout(() => errorElement.remove(), 300);
-            }, 5000);
-        }
-
-        function showWarning(message) {
-            const warningElement = document.createElement('div');
-            warningElement.className = 'error-message';
-            warningElement.style.background = '#FFF8E6';
-            warningElement.style.color = '#E6A700';
-            warningElement.style.borderColor = 'rgba(230, 167, 0, 0.2)';
-            warningElement.innerHTML = `
-                <i class="fas fa-exclamation-triangle"></i>
-                <strong>Warning:</strong> ${message}
-            `;
-            
-            const presaleCard = document.querySelector('.presale-card');
-            const existingWarning = presaleCard.querySelector('.error-message');
-            if (existingWarning) existingWarning.remove();
-            
-            presaleCard.prepend(warningElement);
-            setTimeout(() => {
-                warningElement.classList.add('fade-out');
-                setTimeout(() => warningElement.remove(), 300);
-            }, 5000);
-        }
-    
-        // Initialize countdown outside DOMContentLoaded to ensure elements exist
-        setInterval(updateCountdownFromNow, 1000);
-        updateCountdownFromNow();
     </script>
 </body>
 </html>
