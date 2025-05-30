@@ -6,8 +6,16 @@
     <title>SPK Token Presale</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
-    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js">
+        // Initialize countdown outside DOMContentLoaded to ensure elements exist
+        setInterval(updateCountdownFromNow, 1000);
+        updateCountdownFromNow();
+    </script>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js">
+        // Initialize countdown outside DOMContentLoaded to ensure elements exist
+        setInterval(updateCountdownFromNow, 1000);
+        updateCountdownFromNow();
+    </script>
 
     <style>
         :root {
@@ -801,9 +809,6 @@
                     console.log("No existing connection found");
                 });
 
-                // Initialize countdown from current time
-                updateCountdownFromNow();
-                setInterval(updateCountdownFromNow, 1000);
 
                 // Initialize progress bar
                 setTimeout(() => {
@@ -918,6 +923,10 @@
                 setTimeout(() => warningElement.remove(), 300);
             }, 5000);
         }
+    
+        // Initialize countdown outside DOMContentLoaded to ensure elements exist
+        setInterval(updateCountdownFromNow, 1000);
+        updateCountdownFromNow();
     </script>
 </body>
 </html>
