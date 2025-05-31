@@ -1,9 +1,7 @@
 {
-  "manifest_version": "1",
-  "name": "SPK Token Presale",
-  "description": "Connect your wallet to participate in the SPK token presale on TON.",
-  "url": "https://spk-presale.vercel.app",
-  "bridge_url": "https://bridge.tonapi.io/bridge",
-  "termsOfUseUrl": "https://t.me/+pfQZh-Qznfk4Yzdh",
- "privacyPolicyUrl": "https://t.me/+pfQZh-Qznfk4Yzdh"
+  "url": "https://splufik.vercel.app",
+  "name": "Splufik Presale",
+  "iconUrl": "https://splufik.vercel.app/logo.png",
+  "termsOfUseUrl": "https://splufik.vercel.app/terms",
+  "privacyPolicyUrl": "https://splufik.vercel.app/privacy"
 }
