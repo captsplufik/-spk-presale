@@ -6,7 +6,6 @@
     <title>SPK Token Presale</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- TonConnect UI Script -->
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <style>
         :root {
@@ -314,41 +313,37 @@
             font-weight: 600;
         }
 
-        /* Error Message Styles */
-        .error-message {
-            background: #FFF0F0;
-            color: #FF4444;
+        /* Transaction Status */
+        .transaction-status {
             padding: 12px;
             border-radius: 8px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            margin: 15px 0;
+            font-weight: 500;
+            text-align: center;
             animation: fadeIn 0.3s ease;
-            border: 1px solid rgba(255, 68, 68, 0.2);
+        }
+
+        .status-pending {
+            background-color: #FFF8E6;
+            color: #E6A700;
+            border: 1px solid rgba(230, 167, 0, 0.2);
+        }
+
+        .status-success {
+            background-color: #F0FFF4;
+            color: #38A169;
+            border: 1px solid rgba(56, 161, 105, 0.2);
+        }
+
+        .status-error {
+            background-color: #FFF0F0;
+            color: #E53E3E;
+            border: 1px solid rgba(229, 62, 62, 0.2);
         }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Button States */
-        #contribute-btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none !important;
-            box-shadow: none !important;
-        }
-
-        #contribute-btn .fa-spinner {
-            margin-right: 8px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
 
         /* Tokenomics Section */
@@ -579,19 +574,20 @@
                 </div>
                 
                 <!-- Wallet Connect Button -->
-                <div id="ton-connect" class="my-4"></div>
+                <div id="ton-connect"></div>
                 
-                <!-- TON Purchase Form -->
-                <div style="margin-top: 20px;">
-                    <label for="tonAmount">Enter TON to Spend:</label>
-                    <input type="number" id="tonAmount" placeholder="e.g. 5" style="padding: 10px; width: 120px; border: 1px solid #E2E8F0; border-radius: 8px;" />
-                    <button onclick="sendTON()" class="btn btn-primary" style="padding: 10px 20px; margin-left: 10px;">Buy SPK</button>
+                <!-- Purchase Form -->
+                <div class="presale-form">
+                    <div class="input-group">
+                        <label for="tonAmount">TON Amount</label>
+                        <input type="number" id="tonAmount" placeholder="1 to 500 TON" min="1" max="500">
+                    </div>
+                    <button class="btn btn-primary" id="buy-spk-btn">
+                        <i class="fas fa-coins"></i> Buy SPK Tokens
+                    </button>
+                    <div id="transaction-status"></div>
+                    <p class="token-price">1 TON = <span>20 SPK</span></p>
                 </div>
-
-                <!-- Transaction Status -->
-                <div id="status" style="margin-top: 15px; color: var(--primary); font-weight: 500;"></div>
-                
-                <p class="token-price">1 TON = <span>20 SPK</span></p>
             </div>
         </div>
     </section>
@@ -674,10 +670,19 @@
     </section>
 
     <script>
-        // TonConnect setup
-        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+        // Configuration
+        const config = {
             manifestUrl: "https://splufik.vercel.app/tonconnect-manifest.json",
             buttonRootId: "ton-connect",
+            chain: 'mainnet',
+            tokenRate: 20, // 1 TON = 20 SPK
+            presaleAddress: "UQC6_hQoFH_S0zAnK2fFMuAxMIqgIssXjYuqtCJtKBKeN8sI"
+        };
+
+        // Initialize TON Connect
+        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: config.manifestUrl,
+            buttonRootId: config.buttonRootId,
             language: 'en',
             uiPreferences: {
                 theme: 'DARK',
@@ -692,89 +697,168 @@
             }
         });
 
-        // Handle wallet connection changes
-        tonConnectUI.onStatusChange((wallet) => {
-            const walletStatus = document.getElementById('wallet-status');
-            
-            if (wallet) {
-                const shortAddress = `${wallet.account.address.slice(0, 6)}...${wallet.account.address.slice(-4)}`;
-                walletStatus.textContent = `Connected: ${shortAddress}`;
-                walletStatus.classList.add('connected');
-            } else {
-                walletStatus.textContent = 'Not Connected';
-                walletStatus.classList.remove('connected');
+        // DOM Elements
+        const elements = {
+            walletStatus: document.getElementById('wallet-status'),
+            tonAmount: document.getElementById('tonAmount'),
+            buyButton: document.getElementById('buy-spk-btn'),
+            transactionStatus: document.getElementById('transaction-status'),
+            countdown: {
+                days: document.getElementById('days'),
+                hours: document.getElementById('hours'),
+                minutes: document.getElementById('minutes'),
+                banner: document.getElementById('countdown')
             }
+        };
+
+        // Initialize when DOM loads
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize wallet connection
+            setupWalletConnection();
+            
+            // Initialize countdown timer
+            setupCountdown();
+            
+            // Initialize progress bar
+            setTimeout(() => {
+                document.getElementById('presaleProgress').style.width = '25%';
+            }, 500);
+            
+            // Setup buy button event
+            elements.buyButton.addEventListener('click', handlePurchase);
         });
 
-        async function sendTON() {
-            const tonAmount = document.getElementById("tonAmount").value;
-            if (!tonAmount || tonAmount <= 0) {
-                document.getElementById("status").innerText = "❌ Please enter a valid amount of TON.";
+        // Wallet Connection Setup
+        function setupWalletConnection() {
+            tonConnectUI.onStatusChange((wallet) => {
+                if (wallet) {
+                    const shortAddress = `${wallet.account.address.slice(0, 6)}...${wallet.account.address.slice(-4)}`;
+                    elements.walletStatus.textContent = `Connected: ${shortAddress}`;
+                    elements.walletStatus.classList.add('connected');
+                    
+                    if (wallet.account.chain !== config.chain) {
+                        showTransactionStatus(`Please switch to ${config.chain} in your wallet`, 'error');
+                    }
+                } else {
+                    elements.walletStatus.textContent = 'Not Connected';
+                    elements.walletStatus.classList.remove('connected');
+                }
+            });
+        }
+
+        // Handle Token Purchase
+        async function handlePurchase() {
+            const tonAmount = parseFloat(elements.tonAmount.value);
+            
+            // Validate input
+            if (!tonAmount || tonAmount < 1 || tonAmount > 500) {
+                showTransactionStatus('Please enter between 1-500 TON', 'error');
                 return;
             }
-
+            
+            // Check wallet connection
             const wallet = await tonConnectUI.connector.connectWallet();
             if (!wallet) {
-                document.getElementById("status").innerText = "❌ Please connect your wallet.";
+                showTransactionStatus('Please connect your wallet', 'error');
                 return;
             }
-
-            const tonNano = (tonAmount * 1e9).toString(); // convert TON to nanoTON
-            const tx = {
-                validUntil: Math.floor(Date.now() / 1000) + 600, // valid 10 mins
-                messages: [
-                    {
-                        address: "UQC6_hQoFH_S0zAnK2fFMuAxMIqgIssXjYuqtCJtKBKeN8sI",
-                        amount: tonNano,
-                    }
-                ]
-            };
-
+            
+            // Check chain
+            if (wallet.account.chain !== config.chain) {
+                showTransactionStatus(`Please switch to ${config.chain} network`, 'error');
+                return;
+            }
+            
             try {
-                document.getElementById("status").innerText = "⏳ Processing transaction...";
+                // Prepare transaction
+                const tonNano = (tonAmount * 1e9).toString(); // Convert to nanoTON
+                const spkAmount = tonAmount * config.tokenRate;
+                
+                showTransactionStatus(`Processing ${tonAmount} TON (${spkAmount} SPK) purchase...`, 'pending');
+                
+                const tx = {
+                    validUntil: Math.floor(Date.now() / 1000) + 600, // 10 minutes
+                    messages: [
+                        {
+                            address: config.presaleAddress,
+                            amount: tonNano
+                        }
+                    ]
+                };
+                
+                // Send transaction
                 await tonConnectUI.sendTransaction(tx);
-                document.getElementById("status").innerText = `✅ Success! Sent ${tonAmount} TON to SPK presale.`;
-            } catch (err) {
-                document.getElementById("status").innerText = "❌ Transaction cancelled or failed.";
+                
+                // Success
+                showTransactionStatus(
+                    `Success! ${spkAmount.toLocaleString()} SPK tokens will be sent to your wallet`,
+                    'success'
+                );
+                
+                // Reset form
+                elements.tonAmount.value = '';
+                
+            } catch (error) {
+                console.error('Transaction error:', error);
+                showTransactionStatus(
+                    error.message.includes('Rejected') 
+                        ? 'Transaction rejected by user' 
+                        : 'Transaction failed',
+                    'error'
+                );
             }
         }
 
-        // Countdown Timer counting from NOW to launch date
-        function updateCountdownFromNow() {
-            const launchDate = new Date('2025-06-15T00:00:00Z').getTime(); // June 15, 2025 in UTC
-            const now = new Date().getTime();
-            const diff = launchDate - now;
+        // Show Transaction Status
+        function showTransactionStatus(message, type) {
+            elements.transactionStatus.textContent = message;
+            elements.transactionStatus.className = `transaction-status status-${type}`;
             
-            if (diff <= 0) {
-                // Presale has launched
-                document.getElementById('days').textContent = '00';
-                document.getElementById('hours').textContent = '00';
-                document.getElementById('minutes').textContent = '00';
-                document.getElementById('countdown').textContent = '🎉 Presale is Live!';
-                return;
-            }
-            
-            // Calculate time units
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-            
-            // Update both countdown displays
-            document.getElementById('days').textContent = days.toString().padStart(2, '0');
-            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
-            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-            document.getElementById('countdown').textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+            // Auto-hide after 10 seconds
+            setTimeout(() => {
+                if (elements.transactionStatus.textContent === message) {
+                    elements.transactionStatus.textContent = '';
+                    elements.transactionStatus.className = 'transaction-status';
+                }
+            }, 10000);
         }
 
-        // Initialize progress bar
-        setTimeout(() => {
-            document.getElementById('presaleProgress').style.width = '25%';
-        }, 500);
-
-        // Initialize countdown
-        setInterval(updateCountdownFromNow, 1000);
-        updateCountdownFromNow();
+        // Countdown Timer
+        function setupCountdown() {
+            const launchDate = new Date('2025-06-15T00:00:00Z').getTime();
+            
+            function update() {
+                const now = new Date().getTime();
+                const diff = launchDate - now;
+                
+                if (diff <= 0) {
+                    // Presale has launched
+                    elements.countdown.days.textContent = '00';
+                    elements.countdown.hours.textContent = '00';
+                    elements.countdown.minutes.textContent = '00';
+                    elements.countdown.banner.textContent = '🎉 Presale is Live!';
+                    return;
+                }
+                
+                // Calculate time units
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                // Update displays
+                elements.countdown.days.textContent = days.toString().padStart(2, '0');
+                elements.countdown.hours.textContent = hours.toString().padStart(2, '0');
+                elements.countdown.minutes.textContent = minutes.toString().padStart(2, '0');
+                elements.countdown.banner.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+            }
+            
+            // Initial update
+            update();
+            
+            // Update every second
+            setInterval(update, 1000);
+        }
     </script>
 </body>
 </html>
