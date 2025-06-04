@@ -6,14 +6,12 @@
     <title>SPK Token Presale</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
-    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <style>
         :root {
-            --primary: #4F46E5;  /* New indigo */
+            --primary: #4F46E5;
             --primary-dark: #4338CA;
-            --secondary: #10B981; /* New emerald */
-            --accent: #F59E0B;    /* New amber */
+            --secondary: #10B981;
+            --accent: #F59E0B;
             --dark: #1E1E2D;
             --light: #F8FAFC;
             --gray: #94A3B8;
@@ -446,6 +444,26 @@
             color: var(--gray);
         }
 
+        /* Airdrop Section */
+        .airdrop-section {
+            text-align: center;
+            margin: 40px 0;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 12px;
+        }
+
+        .airdrop-section h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .airdrop-section p {
+            margin: 10px 0 20px;
+            color: var(--gray);
+        }
+
         /* Responsive */
         @media (max-width: 992px) {
             .hero-content {
@@ -532,6 +550,7 @@
                 <a href="#tokenomics">Tokenomics</a>
                 <a href="#roadmap">Roadmap</a>
                 <a href="#faq">FAQ</a>
+                <a href="#airdrop">Airdrop</a>
             </nav>
             <div id="ton-connection">
                 <div id="ton-connect"></div>
@@ -601,9 +620,6 @@
                         <div class="progress" id="presaleProgress"></div>
                     </div>
                 </div>
-                
-                <!-- Wallet Connect Button -->
-                <div id="ton-connect" class="my-4"></div>
                 
                 <!-- Purchase Form -->
                 <div class="presale-form">
@@ -690,6 +706,15 @@
         </div>
     </section>
 
+    <!-- Airdrop Section -->
+    <section id="airdrop" class="airdrop-section">
+        <div class="container">
+            <h2>🎁 Claim Your Free SPK Airdrop</h2>
+            <p>You can now participate in the SPK airdrop if you meet eligibility!</p>
+            <a href="spk_airdrop.html" class="btn btn-outline">Go to Airdrop Page</a>
+        </div>
+    </section>
+
     <!-- FAQ Section -->
     <section id="faq" class="faq-section">
         <div class="container">
@@ -698,143 +723,72 @@
         </div>
     </section>
 
+    <!-- Scripts -->
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <script>
         // Configuration
         const config = {
-            manifestUrl: "https://spk-presale-git-main-captsplufiks-projects.vercel.app/tonconnect-manifest.json",
+            manifestUrl: "https://splufik.vercel.app/tonconnect-manifest.json",
             buttonRootId: "ton-connect",
             chain: 'mainnet',
             tokenRate: 200 // 1 USDT = 200 SPK
         };
 
-        // Initialize TON Connect with error handling
-        async function initTonConnect() {
-            try {
-                // First try with the actual manifest
-                const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-                    manifestUrl: config.manifestUrl,
-                    buttonRootId: config.buttonRootId,
-                    language: 'en',
-                    uiPreferences: {
-                        theme: 'DARK',
-                        colors: {
-                            light: {
-                                connectButton: {
-                                    background: '#4F46E5',
-                                    text: '#FFFFFF'
-                                }
-                            }
+        // Initialize TON Connect
+        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: config.manifestUrl,
+            buttonRootId: config.buttonRootId,
+            language: 'en',
+            uiPreferences: {
+                theme: 'DARK',
+                colors: {
+                    light: {
+                        connectButton: {
+                            background: '#4F46E5',
+                            text: '#FFFFFF'
                         }
                     }
-                });
-
-                // Fallback if manifest loading fails
-                tonConnectUI.onError(async (error) => {
-                    if (error.message.includes('Manifest')) {
-                        console.warn('Using fallback manifest');
-                        const fallbackManifest = {
-                            url: window.location.href,
-                            name: "SPK Token Presale",
-                            iconUrl: "https://via.placeholder.com/256/4F46E5/FFFFFF?text=SPK",
-                            termsOfUseUrl: window.location.href,
-                            privacyPolicyUrl: window.location.href
-                        };
-                        
-                        const blob = new Blob([JSON.stringify(fallbackManifest)], { type: 'application/json' });
-                        const fallbackUrl = URL.createObjectURL(blob);
-                        
-                        // Reinitialize with fallback
-                        return new TON_CONNECT_UI.TonConnectUI({
-                            manifestUrl: fallbackUrl,
-                            buttonRootId: config.buttonRootId,
-                            language: 'en',
-                            uiPreferences: {
-                                theme: 'DARK',
-                                colors: {
-                                    light: {
-                                        connectButton: {
-                                            background: '#4F46E5',
-                                            text: '#FFFFFF'
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    }
-                    throw error;
-                });
-
-                return tonConnectUI;
-            } catch (error) {
-                console.error('TON Connect initialization failed:', error);
-                showError('Wallet Connection', 'Failed to initialize wallet system. Please try again later.');
-                throw error;
+                }
             }
-        }
+        });
+
+        // Handle wallet connection changes
+        tonConnectUI.onStatusChange((wallet) => {
+            const btn = document.getElementById('contribute-btn');
+            const walletStatus = document.getElementById('wallet-status');
+            
+            if (wallet) {
+                const shortAddress = `${wallet.account.address.slice(0, 6)}...${wallet.account.address.slice(-4)}`;
+                btn.innerHTML = '<i class="fas fa-wallet"></i> Buy SPK';
+                btn.disabled = false;
+                walletStatus.textContent = `Connected: ${shortAddress}`;
+                walletStatus.classList.add('connected');
+                
+                if (wallet.account.chain !== config.chain) {
+                    showWarning(`Please switch to ${config.chain} in your wallet`);
+                }
+            } else {
+                btn.innerHTML = '<i class="fas fa-wallet"></i> Connect Wallet';
+                btn.disabled = true;
+                walletStatus.textContent = 'Not Connected';
+                walletStatus.classList.remove('connected');
+            }
+        });
+
+        // Error handling
+        tonConnectUI.onError((error) => {
+            console.error("TON Connection Error:", error);
+            const walletStatus = document.getElementById('wallet-status');
+            walletStatus.innerHTML = '<i class="fas fa-exclamation-circle"></i> Connection Failed';
+            showError("Connection Error", error.message);
+        });
 
         // Initialize when DOM loads
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                const tonConnectUI = await initTonConnect();
-                
-                // Handle wallet connection changes
-                tonConnectUI.onStatusChange((wallet) => {
-                    const btn = document.getElementById('contribute-btn');
-                    const walletStatus = document.getElementById('wallet-status');
-                    
-                    if (wallet) {
-                        try {
-                            const shortAddress = `${wallet.account.address.slice(0, 6)}...${wallet.account.address.slice(-4)}`;
-                            btn.innerHTML = '<i class="fas fa-wallet"></i> Buy SPK';
-                            btn.disabled = false;
-                            walletStatus.textContent = `Connected: ${shortAddress}`;
-                            walletStatus.classList.add('connected');
-                            
-                            if (wallet.account.chain !== config.chain) {
-                                showWarning(`Please switch to ${config.chain} in your wallet`);
-                            }
-                            
-                        } catch (error) {
-                            console.error("Connection processing error:", error);
-                            walletStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
-                            showError("Connection Error", "Failed to process wallet connection");
-                        }
-                    } else {
-                        btn.innerHTML = '<i class="fas fa-wallet"></i> Connect Wallet';
-                        btn.disabled = true;
-                        walletStatus.textContent = 'Not Connected';
-                        walletStatus.classList.remove('connected');
-                    }
-                });
-
-                // Error handling
-                tonConnectUI.onError((error) => {
-                    console.error("TON Connection Error:", error);
-                    const walletStatus = document.getElementById('wallet-status');
-                    walletStatus.innerHTML = '<i class="fas fa-exclamation-circle"></i> Connection Failed';
-                    
-                    if (error.message.includes("Manifest")) {
-                        showError("Configuration Error", `Failed to load wallet configuration. <a href="javascript:location.reload()">Refresh page</a> or try again later.`);
-                    } else {
-                        showError("Connection Error", error.message);
-                    }
-                });
-
-                // Check existing connection
-                tonConnectUI.connectionRestored.then((wallet) => {
-                    if (wallet) console.log("Restored existing connection");
-                }).catch((error) => {
-                    console.log("No existing connection found");
-                });
-
-                // Initialize progress bar
-                setTimeout(() => {
-                    document.getElementById('presaleProgress').style.width = '25%';
-                }, 500);
-
-            } catch (error) {
-                console.error('Initialization error:', error);
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize progress bar
+            setTimeout(() => {
+                document.getElementById('presaleProgress').style.width = '25%';
+            }, 500);
         });
 
         // Countdown Timer counting from NOW to launch date
