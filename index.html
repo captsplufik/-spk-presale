@@ -346,7 +346,8 @@
                     <input type="number" id="usdtAmount" placeholder="10 to 1000 USDT" min="10" max="1000" class="w-full">
                 </div>
                 <button id="contribute-btn" class="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-bold py-4 px-12 rounded-full text-xl shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-500 focus:ring-opacity-75 mt-6" disabled>
-                    <i class="fas fa-coins mr-2"></i> Buy SPK Tokens
+                    <span id="contribute-btn-text"><i class="fas fa-coins mr-2"></i> Buy SPK Tokens</span>
+                    <i id="contribute-btn-spinner" class="fas fa-spinner fa-spin ml-2 hidden"></i>
                 </button>
                 <div id="presale-transaction-status" class="mt-4"></div>
                 <p class="token-price-display">1 USDT = <span id="spk-token-rate">200 SPK</span></p>
@@ -676,6 +677,11 @@
         const presaleTransactionStatusDiv = document.getElementById('presale-transaction-status');
         const presaleTokenRate = 200; // 1 USDT = 200 SPK
 
+        // Get the text and spinner elements for the presale button
+        const contributeBtnText = document.getElementById('contribute-btn-text');
+        const contributeBtnSpinner = document.getElementById('contribute-btn-spinner');
+
+
         usdtAmountInput.addEventListener('input', (e) => {
             let value = parseFloat(e.target.value);
             
@@ -713,7 +719,10 @@
                 return;
             }
 
-            presaleContributeBtn.textContent = 'Processing...';
+            // Set button to processing state
+            contributeBtnText.textContent = 'Processing...';
+            contributeBtnText.classList.remove('mr-2'); // Remove margin for icon if text changes
+            contributeBtnSpinner.classList.remove('hidden'); // Show spinner
             presaleContributeBtn.disabled = true;
             presaleTransactionStatusDiv.innerHTML = '<div class="transaction-status status-warning"><i class="fas fa-hourglass-half mr-2"></i> Processing contribution...</div>';
 
@@ -742,8 +751,6 @@
 
                 presaleTransactionStatusDiv.innerHTML = `<div class="transaction-status status-success"><i class="fas fa-check-circle mr-2"></i> Contribution of ${amount} USDT processed successfully! You received ${amount * presaleTokenRate} SPK.</div>`;
                 showMessage(`Successfully contributed ${amount} USDT!`, 'success');
-                presaleContributeBtn.textContent = 'Buy SPK Tokens'; // Reset button text
-                presaleContributeBtn.disabled = false; // Re-enable for more contributions
                 usdtAmountInput.value = ''; // Clear input
                 spkTokenRateDisplay.textContent = `${presaleTokenRate} SPK`; // Reset SPK display
 
@@ -751,7 +758,11 @@
                 console.error("Presale contribution failed:", error);
                 presaleTransactionStatusDiv.innerHTML = `<div class="transaction-status status-error"><i class="fas fa-exclamation-circle mr-2"></i> Contribution failed: ${error.message || 'An unknown error occurred.'}</div>`;
                 showMessage(`Contribution failed: ${error.message || 'Please try again.'}`, 'error');
-                presaleContributeBtn.textContent = 'Buy SPK Tokens';
+            } finally {
+                // Ensure button state is reset regardless of success or failure
+                contributeBtnText.innerHTML = '<i class="fas fa-coins mr-2"></i> Buy SPK Tokens'; // Reset text and icon
+                contributeBtnText.classList.add('mr-2'); // Add margin back
+                contributeBtnSpinner.classList.add('hidden'); // Hide spinner
                 presaleContributeBtn.disabled = false;
             }
         });
