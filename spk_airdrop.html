@@ -1,0 +1,65 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SPK Airdrop</title>
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+  <style>
+    body { font-family: Arial; padding: 20px; background: #f9f9f9; text-align: center; }
+    .box { background: white; padding: 25px; border-radius: 10px; max-width: 500px; margin: auto; }
+    input, button { margin: 8px; padding: 8px; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>🎁 SPK Airdrop</h1>
+    <p>To claim 25,000 SPK, you must:</p>
+    <ul style="text-align: left;">
+      <li>✅ Buy at least 5,000 SPK</li>
+      <li>✅ Refer at least 3 people</li>
+      <li>✅ Join our <a href="https://t.me/+pfQZh-Qznfk4Yzdh" target="_blank">Telegram group</a></li>
+    </ul>
+    <div id="ton-connect"></div>
+    <p id="wallet-address"></p>
+    <p>Your referral link:</p>
+    <input type="text" id="ref-link" readonly />
+    <button onclick="copyRef()">Copy Referral Link</button><br/>
+    <button id="claim-btn" disabled onclick="claim()">Claim Airdrop</button>
+    <p id="status"></p>
+    <p><a href="spk_presale.html">← Back to Presale</a></p>
+  </div>
+
+<script>
+  const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+    manifestUrl: "https://splufik.vercel.app/tonconnect-manifest.json",
+    buttonRootId: "ton-connect"
+  });
+
+  let connectedAddress = "";
+  tonConnectUI.onStatusChange(wallet => {
+    if (wallet && wallet.account.address) {
+      connectedAddress = wallet.account.address;
+      document.getElementById("wallet-address").textContent = "Connected: " + connectedAddress;
+      const refLink = window.location.origin + window.location.pathname + "?ref=" + connectedAddress;
+      document.getElementById("ref-link").value = refLink;
+      document.getElementById("claim-btn").disabled = false;
+    }
+  });
+
+  function copyRef() {
+    const input = document.getElementById("ref-link");
+    input.select();
+    input.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    alert("Referral link copied!");
+  }
+
+  function claim() {
+    document.getElementById("status").textContent = "✅ You have claimed 25,000 SPK!";
+    document.getElementById("claim-btn").disabled = true;
+  }
+</script>
+</body>
+</html>
