@@ -704,4 +704,158 @@
         });
 
         presaleContributeBtn.addEventListener('click', async () => {
-            if (!tonConn
+            if (!tonConnectUI || !tonConnectUI.connected) {
+                showMessage('Please connect your wallet first to contribute.', 'error');
+                return;
+            }
+            if (new Date().getTime() >= presaleEndDate.getTime()) {
+                showMessage('The presale has already ended.', 'error');
+                return;
+            }
+
+            const amount = parseFloat(usdtAmountInput.value);
+            if (isNaN(amount) || amount < 10 || amount > 1000) {
+                showMessage('Please enter a valid amount between 10-1000 USDT.', 'error');
+                return;
+            }
+
+            // Set button to processing state
+            contributeBtnNormalState.classList.add('hidden');
+            contributeBtnProcessingState.classList.remove('hidden');
+            presaleContributeBtn.disabled = true;
+            presaleTransactionStatusDiv.innerHTML = '<div class="transaction-status status-warning"><i class="fas fa-hourglass-half mr-2"></i> Processing contribution...</div>';
+
+            try {
+                // Convert USDT amount to TON (assuming 1 TON = 2.5 USDT for demonstration, replace with real oracle if available)
+                // This is a placeholder for your actual conversion logic or if your contract expects TON for USDT
+                const tonEquivalent = amount / 2.5; // Example: 1 TON = 2.5 USDT
+                const tonNano = (tonEquivalent * 1e9).toFixed(0); // Convert to NanoTON and make sure it's an integer string
+
+                const tx = {
+                    validUntil: Math.floor(Date.now() / 1000) + 600, // 10 minutes from now
+                    messages: [{
+                        address: "UQC6_hQoFH_S0zAnK2fFMuAxMIqgIssXjYuqtCJtKBKeN8sI", // Your presale wallet address
+                        amount: tonNano
+                    }]
+                };
+
+                await tonConnectUI.sendTransaction(tx);
+                
+                presaleTransactionStatusDiv.innerHTML = `<div class="transaction-status status-success"><i class="fas fa-check-circle mr-2"></i> Sent ${tonEquivalent.toFixed(2)} TON to SPK presale wallet! You received ${amount * presaleTokenRate} SPK.</div>`;
+                showMessage(`Successfully contributed ${amount} USDT!`, 'success');
+                usdtAmountInput.value = ''; // Clear input
+                spkTokenRateDisplay.textContent = `${presaleTokenRate} SPK`; // Reset SPK display
+
+            } catch (error) {
+                console.error("Presale contribution failed:", error);
+                presaleTransactionStatusDiv.innerHTML = `<div class="transaction-status status-error"><i class="fas fa-exclamation-circle mr-2"></i> Transaction cancelled or failed.</div>`;
+                showMessage(`Contribution failed: ${error.message || 'Transaction cancelled or failed.'}`, 'error');
+            } finally {
+                // Ensure button state is reset regardless of success or failure
+                contributeBtnNormalState.classList.remove('hidden');
+                contributeBtnProcessingState.classList.add('hidden');
+                presaleContributeBtn.disabled = false;
+            }
+        });
+
+
+        // --- Three.js 3D Background Setup ---
+        // This function runs when the window has fully loaded all assets
+        window.onload = function () {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('three-bg'), antialias: true, alpha: true });
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+
+            // Add ambient light
+            const ambientLight = new THREE.AmbientLight(0x404040, 2); // soft white light
+            scene.add(ambientLight);
+
+            // Add a directional light
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(1, 1, 1).normalize();
+            scene.add(directionalLight);
+
+            // Create multiple abstract shapes
+            const geometries = [
+                new THREE.TorusKnotGeometry(1, 0.4, 100, 16),
+                new THREE.SphereGeometry(1, 32, 32),
+                new THREE.BoxGeometry(1.5, 1.5, 1.5),
+                new THREE.OctahedronGeometry(1.2)
+            ];
+
+            const materials = [
+                new THREE.MeshStandardMaterial({ color: 0x9333ea, transparent: true, opacity: 0.6, roughness: 0.5, metalness: 0.8 }), // Purple
+                new THREE.MeshStandardMaterial({ color: 0xec4899, transparent: true, opacity: 0.6, roughness: 0.5, metalness: 0.8 }), // Pink
+                new THREE.MeshStandardMaterial({ color: 0x06b6d4, transparent: true, opacity: 0.6, roughness: 0.5, metalness: 0.8 }), // Cyan
+                new THREE.MeshStandardMaterial({ color: 0x6d28d9, transparent: true, opacity: 0.6, roughness: 0.5, metalness: 0.8 }) // Darker Purple
+            ];
+
+            const objects = [];
+            for (let i = 0; i < 10; i++) {
+                const geometry = geometries[Math.floor(Math.random() * geometries.length)];
+                const material = materials[Math.floor(Math.random() * materials.length)];
+                const mesh = new THREE.Mesh(geometry, material);
+
+                mesh.position.set(
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20 - 10 // Push some objects further back
+                );
+                mesh.rotation.set(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                );
+                mesh.scale.setScalar(0.5 + Math.random() * 1.5); // Random scale
+                scene.add(mesh);
+                objects.push(mesh);
+            }
+
+            camera.position.z = 5;
+
+            // Mouse interaction for subtle camera movement
+            let mouseX = 0, mouseY = 0;
+            let targetX = 0, targetY = 0;
+            const windowHalfX = window.innerWidth / 2;
+            const windowHalfY = window.innerHeight / 2;
+
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX - windowHalfX) * 0.001;
+                mouseY = (event.clientY - windowHalfY) * 0.001;
+            });
+
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+
+                targetX = mouseX * 0.5;
+                targetY = mouseY * 0.5;
+
+                camera.rotation.y += (targetX - camera.rotation.y) * 0.05;
+                camera.rotation.x += (targetY - camera.rotation.x) * 0.05;
+
+                objects.forEach(obj => {
+                    obj.rotation.x += 0.001 + Math.random() * 0.001;
+                    obj.rotation.y += 0.001 + Math.random() * 0.001;
+                    obj.position.y += Math.sin(Date.now() * 0.0001 + obj.position.x) * 0.005; // Subtle floating
+                    obj.position.x += Math.cos(Date.now() * 0.0001 + obj.position.y) * 0.005; // Subtle floating
+                });
+
+                renderer.render(scene, camera);
+            }
+
+            animate();
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+    </script>
+</body>
+</html>
