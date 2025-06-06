@@ -373,6 +373,12 @@
                 </button>
                 <div id="presale-transaction-status" class="mt-4"></div>
                 <p class="token-price-display">1 USDT = <span id="spk-token-rate">200 SPK</span></p>
+
+                <!-- New: Presale Claim Button -->
+                <button id="claim-presale-tokens-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-lg shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-75 mt-4" disabled>
+                    Claim Presale Tokens
+                </button>
+                <div id="presale-claim-status" class="mt-4 text-green-400 font-semibold"></div>
             </div>
         </div>
     </section>
@@ -478,6 +484,27 @@
             }, 5000); // Hide after 5 seconds
         }
 
+        // --- Smart Contract Constants (Placeholders) ---
+        // In a real application, replace these with your actual deployed contract details.
+        const AIRDROP_CONTRACT_ADDRESS = "EQCD39VS5z_NY_m-bYk_J9Kk5P-uQ0zQ_Vb7iQ1o4n8-j7Xf"; // Example address
+        const PRESALE_CONTRACT_ADDRESS = "UQC6_hQoFH_S0zAnK2fFMuAxMIqgIssXjYuqtCJtKBKeN8sI"; // Updated address
+        // Simplified ABI for demonstration. Real ABI would be much larger and specific to your contract functions.
+        const CONTRACT_ABI = [
+            {
+                "name": "claimAirdrop",
+                "inputs": [],
+                "outputs": [],
+                "type": "function"
+            },
+            {
+                "name": "contributePresale",
+                "inputs": [],
+                "outputs": [],
+                "type": "function"
+            }
+        ];
+
+
         // --- TON Connect Configuration ---
         const tonConnectConfig = {
             manifestUrl: "https://splufik.vercel.app/tonconnect-manifest.json",
@@ -493,12 +520,11 @@
 
         const claimBtn = document.getElementById("claim-btn"); // Get the airdrop claim button
         const contributeBtn = document.getElementById("contribute-btn"); // Presale button
+        const claimPresaleTokensBtn = document.getElementById("claim-presale-tokens-btn"); // New: Presale Claim Button
 
         // Simulate eligibility check
         function simulateCheckEligibility() {
             // These are placeholder conditions — replace with real API calls later
-            // For demonstration, let's set them based on a query parameter or connected status
-            // For now, mirroring the user's provided 'true' values
             purchased = true;
             referred = true;
             telegramJoined = true;
@@ -509,39 +535,61 @@
         // Update UI based on eligibility
         function updateEligibilityDisplay() {
             const isWalletConnected = tonConnectUI && tonConnectUI.connected;
+            const now = new Date().getTime();
 
+            // Airdrop eligibility display
             if (!isWalletConnected) {
                 document.getElementById("purchase-status").textContent = "❌ Connect wallet to check eligibility";
                 document.getElementById("referral-status").textContent = ""; // Clear if not connected
                 document.getElementById("telegram-status").textContent = ""; // Clear if not connected
                 claimBtn.disabled = true;
                 claimBtn.textContent = "Connect Wallet to Claim";
-                contributeBtn.disabled = true; // Also disable presale button
-                return;
-            }
-
-            document.getElementById("purchase-status").textContent = purchased
-                ? "✅ Bought 5,000+ SPK"
-                : "❌ Buy at least 5,000 SPK";
-            document.getElementById("referral-status").textContent = referred
-                ? "✅ Referred 3+ users"
-                : "❌ Refer at least 3 people";
-            document.getElementById("telegram-status").textContent = telegramJoined
-                ? "✅ Joined Telegram"
-                : "❌ Join Telegram group";
-
-            const eligible = purchased && referred && telegramJoined;
-            
-            // Only enable the claim button if all conditions (wallet connected AND eligibility) are met
-            if (eligible) {
-                claimBtn.disabled = false;
-                claimBtn.textContent = "Claim Airdrop";
             } else {
-                claimBtn.disabled = true;
-                claimBtn.textContent = "Meet All Requirements to Claim";
+                document.getElementById("purchase-status").textContent = purchased
+                    ? "✅ Bought 5,000+ SPK"
+                    : "❌ Buy at least 5,000 SPK";
+                document.getElementById("referral-status").textContent = referred
+                    ? "✅ Referred 3+ users"
+                    : "❌ Refer at least 3 people";
+                document.getElementById("telegram-status").textContent = telegramJoined
+                    ? "✅ Joined Telegram"
+                    : "❌ Join Telegram group";
+
+                const eligibleForAirdropCriteria = purchased && referred && telegramJoined;
+                const airdropAvailableDuringPeriod = now < airdropEndDate.getTime();
+                const airdropAvailableAfterPresale = now >= presaleEndDate.getTime(); // New condition
+
+                const eligibleForAirdrop = eligibleForAirdropCriteria && (airdropAvailableDuringPeriod || airdropAvailableAfterPresale);
+                
+                if (eligibleForAirdrop) {
+                    claimBtn.disabled = false;
+                    claimBtn.textContent = "Claim Airdrop";
+                } else {
+                    claimBtn.disabled = true;
+                    if (!eligibleForAirdropCriteria) {
+                        claimBtn.textContent = "Meet All Requirements to Claim";
+                    } else if (now >= airdropEndDate.getTime() && now < presaleEndDate.getTime()) {
+                        claimBtn.textContent = "Airdrop Ended (Wait for Presale End)";
+                    } else {
+                        claimBtn.textContent = "Airdrop Ended";
+                    }
+                }
             }
-            // Ensure presale button is enabled if wallet is connected, regardless of airdrop eligibility
-            contributeBtn.disabled = !isWalletConnected;
+
+            // Presale buttons state based on wallet connection and time
+            contributeBtn.disabled = !isWalletConnected || now >= presaleEndDate.getTime();
+            if (now >= presaleEndDate.getTime()) {
+                contributeBtn.textContent = "Presale Ended";
+            } else {
+                contributeBtn.textContent = "Buy SPK Tokens";
+            }
+
+            claimPresaleTokensBtn.disabled = !isWalletConnected || now < presaleEndDate.getTime();
+            if (now < presaleEndDate.getTime()) {
+                claimPresaleTokensBtn.textContent = "Presale Claim Not Active";
+            } else {
+                claimPresaleTokensBtn.textContent = "Claim Your Presale Tokens";
+            }
         }
 
 
@@ -596,13 +644,11 @@
                 });
 
                 // Trigger an initial check for connection status after TonConnectUI is initialized
-                // This ensures the UI reflects the current connection state on page load.
                 const initialWallet = await tonConnectUI.connected;
                 if (initialWallet && initialWallet.account?.address) {
                      // onStatusChange will handle this
                 } else {
-                    // Manually trigger disable if no initial connection found, to set initial button state
-                    disableClaimButton();
+                    disableClaimButton(); // Manually trigger disable if no initial connection found
                 }
 
             } catch (error) {
@@ -627,19 +673,20 @@
             showMessage("Referral link copied!", "success");
         }
 
-        // A helper function to disable the claim button and reset related UI elements
+        // A helper function to disable buttons and reset related UI elements when wallet is disconnected
         function disableClaimButton() {
             claimBtn.disabled = true;
             claimBtn.textContent = "Connect Wallet to Claim";
             document.getElementById("wallet-address").textContent = "Not Connected";
             document.getElementById("ref-link").value = "Connect wallet to generate referral link";
-            contributeBtn.disabled = true; // Also disable presale button
+            contributeBtn.disabled = true;
+            claimPresaleTokensBtn.disabled = true; // Disable new claim button too
             updateEligibilityDisplay(); // Update eligibility display to reflect disconnected state
         }
 
 
         // Airdrop claim function
-        document.getElementById('claim-btn').addEventListener('click', () => {
+        document.getElementById('claim-btn').addEventListener('click', async () => {
             if (!tonConnectUI || !tonConnectUI.connected) {
                 showMessage('Please connect your wallet to claim the airdrop.', 'error');
                 return;
@@ -649,12 +696,47 @@
                 return;
             }
 
-            document.getElementById("status").textContent = "✅ You have claimed 25,000 SPK!";
+            const statusElement = document.getElementById("status");
+            statusElement.textContent = "Processing Airdrop Claim... ";
             claimBtn.disabled = true;
-            claimBtn.textContent = "Claimed!";
-            document.getElementById('airdrop-transaction-status').innerHTML = ''; // Clear previous transaction status
+            claimBtn.textContent = "Claiming...";
+            document.getElementById('airdrop-transaction-status').innerHTML = '<div class="transaction-status status-warning"><i class="fas fa-hourglass-half mr-2"></i> Initiating claim transaction...</div>';
 
-            showMessage('SPK Airdrop claimed successfully!', 'success');
+            try {
+                // Simulate sending a transaction to the airdrop smart contract
+                const tx = {
+                    validUntil: Math.floor(Date.now() / 1000) + 600, // 10 minutes from now
+                    messages: [{
+                        address: AIRDROP_CONTRACT_ADDRESS,
+                        amount: "10000000", // Small amount for gas/message value (0.01 TON)
+                    }]
+                };
+                await tonConnectUI.sendTransaction(tx);
+
+                statusElement.textContent = "✅ You have claimed 25,000 SPK!";
+                claimBtn.textContent = "Claimed!";
+                document.getElementById('airdrop-transaction-status').innerHTML = '<div class="transaction-status status-success"><i class="fas fa-check-circle mr-2"></i> SPK Airdrop claimed successfully!</div>';
+                showMessage('SPK Airdrop claimed successfully!', 'success');
+                
+                // For a real scenario, you'd query the smart contract for claim status.
+                // For this simulation, we'll keep the eligibility criteria for airdrop as true for now.
+                // If it's a one-time claim per address, you'd mark it as claimed in backend/smart contract.
+
+            } catch (error) {
+                console.error("Airdrop claim failed:", error);
+                statusElement.textContent = "❌ Claim failed.";
+                document.getElementById('airdrop-transaction-status').innerHTML = `<div class="transaction-status status-error"><i class="fas fa-exclamation-circle mr-2"></i> Claim failed: ${error.message || 'Transaction cancelled or failed.'}</div>`;
+                showMessage(`Airdrop claim failed: ${error.message || 'Transaction cancelled or failed.'}`, 'error');
+            } finally {
+                // Keep the button disabled if claimed successfully, otherwise re-enable to allow retries
+                if (statusElement.textContent.includes("Claimed!")) {
+                    claimBtn.disabled = true;
+                } else {
+                    claimBtn.disabled = false;
+                    claimBtn.textContent = "Claim Airdrop"; // Reset text
+                }
+                updateEligibilityDisplay(); // Ensure display reflects actual state after attempt
+            }
         });
 
 
@@ -666,29 +748,28 @@
         const airdropSecondsElement = document.getElementById('airdrop-seconds');
 
         const airdropEndDate = new Date();
-        airdropEndDate.setDate(airdropEndDate.getDate() + 7);
+        airdropEndDate.setDate(airdropEndDate.getDate() + 7); // Airdrop ends in 7 days from now
 
         function updateAirdropCountdown() {
             const now = new Date().getTime();
             const distance = airdropEndDate.getTime() - now;
 
             if (distance < 0) {
-                clearInterval(airdropCountdownInterval);
+                // Airdrop period is over
                 airdropCountdownElement.innerHTML = "<span class='text-red-500'>AIRDROP HAS ENDED!</span>";
-                claimBtn.disabled = true; // Use the globally defined claimBtn
-                claimBtn.textContent = "Airdrop Ended";
-                return;
+                // Don't disable claimBtn here, updateEligibilityDisplay will handle it based on presale end
+            } else {
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                airdropDaysElement.textContent = String(days).padStart(2, '0');
+                airdropHoursElement.textContent = String(hours).padStart(2, '0');
+                airdropMinutesElement.textContent = String(minutes).padStart(2, '0');
+                airdropSecondsElement.textContent = String(seconds).padStart(2, '0');
             }
-
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            airdropDaysElement.textContent = String(days).padStart(2, '0');
-            airdropHoursElement.textContent = String(hours).padStart(2, '0');
-            airdropMinutesElement.textContent = String(minutes).padStart(2, '0');
-            airdropSecondsElement.textContent = String(seconds).padStart(2, '0');
+            updateEligibilityDisplay(); // Re-evaluate airdrop button state frequently
         }
 
         const airdropCountdownInterval = setInterval(updateAirdropCountdown, 1000);
@@ -703,7 +784,7 @@
         const presaleSecondsElement = document.getElementById('presale-seconds');
 
         const presaleEndDate = new Date();
-        presaleEndDate.setDate(presaleEndDate.getDate() + 15);
+        presaleEndDate.setDate(presaleEndDate.getDate() + 15); // Presale ends in 15 days from now
 
         function updatePresaleCountdown() {
             const now = new Date().getTime();
@@ -712,20 +793,18 @@
             if (distance < 0) {
                 clearInterval(presaleCountdownInterval);
                 presaleCountdownElement.innerHTML = "<span class='text-red-500'>PRESALE HAS ENDED!</span>";
-                contributeBtn.disabled = true; // Use the globally defined contributeBtn
-                contributeBtn.textContent = "Presale Ended";
-                return;
+            } else {
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                presaleDaysElement.textContent = String(days).padStart(2, '0');
+                presaleHoursElement.textContent = String(hours).padStart(2, '0');
+                presaleMinutesElement.textContent = String(minutes).padStart(2, '0');
+                presaleSecondsElement.textContent = String(seconds).padStart(2, '0');
             }
-
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            presaleDaysElement.textContent = String(days).padStart(2, '0');
-            presaleHoursElement.textContent = String(hours).padStart(2, '0');
-            presaleMinutesElement.textContent = String(minutes).padStart(2, '0');
-            presaleSecondsElement.textContent = String(seconds).padStart(2, '0');
+            updateEligibilityDisplay(); // Re-evaluate presale buttons state frequently
         }
 
         const presaleCountdownInterval = setInterval(updatePresaleCountdown, 1000);
@@ -762,7 +841,7 @@
             spkTokenRateDisplay.textContent = `${tokenAmount.toLocaleString()} SPK`;
         });
 
-        contributeBtn.addEventListener('click', async () => { // Fixed: Changed from presaleContributeBtn to contributeBtn
+        contributeBtn.addEventListener('click', async () => {
             if (!tonConnectUI || !tonConnectUI.connected) {
                 showMessage('Please connect your wallet first to contribute.', 'error');
                 return;
@@ -781,7 +860,7 @@
             // Set button to processing state
             contributeBtnNormalState.classList.add('hidden');
             contributeBtnProcessingState.classList.remove('hidden');
-            contributeBtn.disabled = true; // Use contributeBtn
+            contributeBtn.disabled = true;
             presaleTransactionStatusDiv.innerHTML = '<div class="transaction-status status-warning"><i class="fas fa-hourglass-half mr-2"></i> Processing contribution...</div>';
 
             try {
@@ -792,14 +871,14 @@
                 const tx = {
                     validUntil: Math.floor(Date.now() / 1000) + 600, // 10 minutes from now
                     messages: [{
-                        address: "UQC6_hQoFH_S0zAnK2fFMuAxMIqgIssXjYuqtCJtKBKeN8sI", // Your presale wallet address
-                        amount: tonNano
+                        address: PRESALE_CONTRACT_ADDRESS, // Send to the presale smart contract
+                        amount: tonNano,
                     }]
                 };
 
                 await tonConnectUI.sendTransaction(tx);
                 
-                presaleTransactionStatusDiv.innerHTML = `<div class="transaction-status status-success"><i class="fas fa-check-circle mr-2"></i> Sent ${tonEquivalent.toFixed(2)} TON to SPK presale wallet! You received ${amount * presaleTokenRate} SPK.</div>`;
+                presaleTransactionStatusDiv.innerHTML = `<div class="transaction-status status-success"><i class="fas fa-check-circle mr-2"></i> Sent ${tonEquivalent.toFixed(2)} TON to SPK presale contract! You received ${amount * presaleTokenRate} SPK.</div>`;
                 showMessage(`Successfully contributed ${amount} USDT!`, 'success');
                 usdtAmountInput.value = '';
                 spkTokenRateDisplay.textContent = `${presaleTokenRate} SPK`;
@@ -816,7 +895,55 @@
                 // Ensure button state is reset regardless of success or failure
                 contributeBtnNormalState.classList.remove('hidden');
                 contributeBtnProcessingState.classList.add('hidden');
-                contributeBtn.disabled = false; // Use contributeBtn
+                contributeBtn.disabled = false;
+                updateEligibilityDisplay(); // Ensure display reflects actual state after attempt
+            }
+        });
+
+        // New: Presale Claim Button Logic
+        claimPresaleTokensBtn.addEventListener('click', async () => {
+            if (!tonConnectUI || !tonConnectUI.connected) {
+                showMessage('Please connect your wallet to claim presale tokens.', 'error');
+                return;
+            }
+            if (new Date().getTime() < presaleEndDate.getTime()) {
+                showMessage('Presale claim is not yet active. Please wait until the presale ends.', 'warning');
+                return;
+            }
+
+            const presaleClaimStatusDiv = document.getElementById('presale-claim-status');
+            presaleClaimStatusDiv.textContent = "Processing Presale Token Claim... ";
+            claimPresaleTokensBtn.disabled = true;
+            claimPresaleTokensBtn.textContent = "Claiming...";
+
+            try {
+                // Simulate sending a transaction to the smart contract to claim presale tokens
+                const tx = {
+                    validUntil: Math.floor(Date.now() / 1000) + 600, // 10 minutes from now
+                    messages: [{
+                        address: PRESALE_CONTRACT_ADDRESS, // Or a separate vesting/claim contract
+                        amount: "5000000", // Small amount for gas/message value (0.005 TON)
+                    }]
+                };
+                await tonConnectUI.sendTransaction(tx);
+
+                presaleClaimStatusDiv.textContent = "✅ Presale tokens claimed successfully!";
+                claimPresaleTokensBtn.textContent = "Tokens Claimed!";
+                showMessage('Presale tokens claimed successfully!', 'success');
+
+                // In a real dApp, you'd track claimed status and disable subsequent claims for this user.
+            } catch (error) {
+                console.error("Presale token claim failed:", error);
+                presaleClaimStatusDiv.innerHTML = `<div class="transaction-status status-error"><i class="fas fa-exclamation-circle mr-2"></i> Claim failed: ${error.message || 'Transaction cancelled or failed.'}</div>`;
+                showMessage(`Presale claim failed: ${error.message || 'Transaction cancelled or failed.'}`, 'error');
+            } finally {
+                if (presaleClaimStatusDiv.textContent.includes("claimed successfully!")) {
+                    claimPresaleTokensBtn.disabled = true;
+                } else {
+                    claimPresaleTokensBtn.disabled = false;
+                    claimPresaleTokensBtn.textContent = "Claim Presale Tokens";
+                }
+                updateEligibilityDisplay();
             }
         });
 
