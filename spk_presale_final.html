@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SPK Presale</title>
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+</head>
+<body>
+  <h1>SPK Token Presale</h1>
+
+  <div id="ton-connect" style="margin-bottom: 20px;"></div>
+
+  <label for="tonAmount">Enter TON to Spend:</label>
+  <input type="number" id="tonAmount" placeholder="e.g. 5" />
+  <button onclick="sendTON()">Buy SPK</button>
+
+  <p id="status" style="margin-top: 10px;"></p>
+
+  <script>
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+      manifestUrl: "https://splufik.vercel.app/tonconnect-manifest.json",
+      buttonRootId: "ton-connect"
+    });
+
+    async function sendTON() {
+      const amount = parseFloat(document.getElementById("tonAmount").value);
+      if (!amount || amount <= 0) {
+        alert("Enter a valid amount of TON.");
+        return;
+      }
+
+      const tonNano = (amount * 1e9).toString();
+      const tx = {
+        validUntil: Math.floor(Date.now() / 1000) + 600,
+        messages: [{
+          address: "UQC6_hQoFH_S0zAnK2fFMuAxMIqgIssXjYuqtCJtKBKeN8sI",
+          amount: tonNano
+        }]
+      };
+
+      try {
+        await tonConnectUI.sendTransaction(tx);
+        document.getElementById("status").innerText = `✅ Sent ${amount} TON to SPK presale wallet.`;
+      } catch (err) {
+        document.getElementById("status").innerText = "❌ Transaction cancelled or failed.";
+      }
+    }
+  </script>
+</body>
+</html>
