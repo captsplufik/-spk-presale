@@ -1,65 +1,340 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SPK Airdrop</title>
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script> <!-- Add Three.js CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> <!-- For icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"> <!-- Inter Font -->
   <style>
-    body { font-family: Arial; padding: 20px; background: #f9f9f9; text-align: center; }
-    .box { background: white; padding: 25px; border-radius: 10px; max-width: 500px; margin: auto; }
-    input, button { margin: 8px; padding: 8px; }
+    body {
+        font-family: 'Inter', sans-serif; /* Use Inter font */
+        background-color: #0d1117; /* Dark background */
+        color: #e2e8f0; /* Light text for dark background */
+        padding: 30px;
+        text-align: center;
+        overflow-x: hidden; /* Prevent horizontal scroll */
+        position: relative; /* Needed for z-index context */
+    }
+    /* Canvas styling for 3D background */
+    #three-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1; /* Send to background */
+        opacity: 0.15; /* Subtle opacity */
+    }
+    .box {
+        background: #1f2937; /* Darker background for the box */
+        padding: 25px;
+        border-radius: 1rem; /* More rounded corners */
+        max-width: 500px;
+        margin: auto;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* Stronger shadow for dark theme */
+        border: 1px solid #374151; /* Subtle border */
+        position: relative; /* Ensure it stays above the canvas */
+        z-index: 1; /* Bring box to front */
+    }
+    input, button {
+        margin: 8px 0;
+        padding: 10px 15px;
+        border: 1px solid #4a5568; /* Darker border for inputs */
+        border-radius: 8px; /* Slightly more rounded inputs/buttons */
+        box-sizing: border-box;
+        background-color: #2d3748; /* Darker input background */
+        color: #e2e8f0; /* Light text for inputs */
+    }
+    input::placeholder {
+        color: #9ca3af; /* Lighter placeholder text */
+    }
+    button {
+        background-color: #6d28d9; /* Deep purple */
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        font-weight: 600;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    button:hover {
+        background-color: #5b21b6; /* Darker purple on hover */
+        transform: translateY(-2px);
+    }
+    button:disabled {
+        opacity: 0.5;
+        pointer-events: none;
+        background-color: #4a5568; /* Muted gray for disabled buttons */
+        box-shadow: none;
+        transform: none;
+    }
+    h1 {
+        color: #d8b4fe; /* Light purple for heading */
+        margin-bottom: 20px;
+        font-size: 2.5rem; /* Larger heading */
+        font-weight: 800; /* Extra bold */
+        background-image: linear-gradient(to right, #a78bfa, #d8b4fe);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    h3 {
+        color: #818cf8; /* Indigo for subheadings */
+        margin-top: 25px;
+        margin-bottom: 10px;
+        font-weight: 700;
+        font-size: 1.25rem; /* Slightly larger subheading */
+    }
+    ul {
+        padding-left: 0;
+    }
+    li {
+        list-style-type: none;
+        margin-bottom: 8px;
+        line-height: 1.5;
+        color: #cbd5e1; /* Lighter gray for list items */
+    }
+    li strong {
+        color: #e2e8f0; /* Even lighter for bold text */
+    }
+    #status {
+        color: #34d399; /* Green for success/status */
+        font-weight: bold;
+        margin-top: 15px;
+    }
+    #presale-status {
+        color: #F59E0B; /* Amber for pending/warning */
+        font-weight: bold;
+        margin-top: 15px;
+    }
+    #wallet-address {
+        color: #94a3b8; /* Gray for wallet address */
+    }
+    /* Icons styling */
+    .fa-check-circle { color: #34d399; }
+    .fa-times-circle { color: #ef4444; }
+    .fa-sync-alt { color: #F59E0B; }
   </style>
 </head>
 <body>
+  <!-- 3D Background Canvas -->
+  <canvas id="three-bg"></canvas>
+
   <div class="box">
-    <h1>🎁 SPK Airdrop</h1>
-    <p>To claim 25,000 SPK, you must:</p>
+    <h1>🎁 Claim your share of 25,000 SPK tokens!</h1>
+    <p class="text-gray-400">Airdrop will be available after the presale ends on <strong>June 16, 2026</strong>.</p>
+
+    <h3 style="text-align: left;">Airdrop Eligibility Criteria:</h3>
     <ul style="text-align: left;">
-      <li>✅ Buy at least 5,000 SPK</li>
-      <li>✅ Refer at least 3 people</li>
-      <li>✅ Join our <a href="https://t.me/+pfQZh-Qznfk4Yzdh" target="_blank">Telegram group</a></li>
+      <li id="purchase-status"><strong>Purchase Requirement:</strong> <span class="text-gray-400">🔄 Checking purchase status (Buy at least 5,000 SPK in presale)</span></li>
+      <li id="referral-status"><strong>Referral Requirement:</strong> <span class="text-gray-400">🔄 Checking referrals (Refer at least 3 people)</span></li>
+      <li id="telegram-status"><strong>Community Requirement:</strong> <span class="text-gray-400">🔄 Checking Telegram (Join Telegram group)</span></li>
     </ul>
-    <div id="ton-connect"></div>
-    <p id="wallet-address"></p>
-    <p>Your referral link:</p>
-    <input type="text" id="ref-link" readonly />
-    <button onclick="copyRef()">Copy Referral Link</button><br/>
-    <button id="claim-btn" disabled onclick="claim()">Claim Airdrop</button>
-    <p id="status"></p>
-    <p><a href="spk_presale.html">← Back to Presale</a></p>
+
+    <div id="ton-connect" class="my-4"></div>
+    <p id="wallet-address" style="margin: 10px 0; font-weight: bold;"></p>
+
+    <div>
+      <p class="text-gray-400">Your referral link:</p>
+      <input type="text" id="ref-link" style="width: 100%; padding: 10px;" readonly />
+      <button onclick="copyRef()" class="w-full mt-4">Copy Referral Link</button><br/>
+
+      <button id="claim-btn" disabled class="w-full mt-6">Connect Wallet to Claim</button>
+      <p id="status" class="mt-4"></p>
+    </div>
+    <div id="presale-status" class="mt-4"></div> <!-- Moved presale status here for better visibility -->
   </div>
 
-<script>
-  const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-    manifestUrl: "https://splufik.vercel.app/tonconnect-manifest.json",
-    buttonRootId: "ton-connect"
-  });
+  <script>
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+      manifestUrl: "https://splufik.vercel.app/tonconnect-manifest.json",
+      buttonRootId: "ton-connect"
+    });
 
-  let connectedAddress = "";
-  tonConnectUI.onStatusChange(wallet => {
-    if (wallet && wallet.account.address) {
-      connectedAddress = wallet.account.address;
-      document.getElementById("wallet-address").textContent = "Connected: " + connectedAddress;
-      const refLink = window.location.origin + window.location.pathname + "?ref=" + connectedAddress;
-      document.getElementById("ref-link").value = refLink;
-      document.getElementById("claim-btn").disabled = false;
+    const claimBtn = document.getElementById("claim-btn");
+    const presaleStatus = document.getElementById("presale-status");
+    const presaleEndDate = new Date("2026-06-16T00:00:00Z");
+
+    let purchased = false;
+    let referred = false;
+    let telegramJoined = false;
+    let connectedAddress = "";
+
+    // This function simulates checking eligibility. In a real app, this would query a backend/blockchain.
+    function simulateCheckEligibility() {
+      // For demonstration, setting all to true.
+      // In a real scenario, these would be determined by actual user actions.
+      purchased = true; // Example: User bought 5,000+ SPK
+      referred = true;  // Example: User referred 3+ people
+      telegramJoined = true; // Example: User joined Telegram
+      updateEligibilityDisplay();
     }
-  });
 
-  function copyRef() {
-    const input = document.getElementById("ref-link");
-    input.select();
-    input.setSelectionRange(0, 99999);
-    document.execCommand("copy");
-    alert("Referral link copied!");
-  }
+    function updateEligibilityDisplay() {
+      // Update text content based on eligibility status
+      document.getElementById("purchase-status").innerHTML = purchased
+        ? '<strong>Purchase Requirement:</strong> <span class="text-green-400">✅ Bought 5,000+ SPK</span>'
+        : '<strong>Purchase Requirement:</strong> <span class="text-red-400">❌ Buy at least 5,000 SPK in presale</span>';
+      document.getElementById("referral-status").innerHTML = referred
+        ? '<strong>Referral Requirement:</strong> <span class="text-green-400">✅ Referred 3+ users</span>'
+        : '<strong>Referral Requirement:</strong> <span class="text-red-400">❌ Refer at least 3 people</span>';
+      document.getElementById("telegram-status").innerHTML = telegramJoined
+        ? '<strong>Community Requirement:</strong> <span class="text-green-400">✅ Joined Telegram</span>'
+        : '<strong>Community Requirement:</strong> <span class="text-red-400">❌ Join Telegram group</span>';
 
-  function claim() {
-    document.getElementById("status").textContent = "✅ You have claimed 25,000 SPK!";
-    document.getElementById("claim-btn").disabled = true;
-  }
-</script>
+      const eligible = purchased && referred && telegramJoined;
+      const now = new Date();
+
+      if (now < presaleEndDate) {
+        presaleStatus.textContent = "⏳ Presale is ongoing. Claim will be available after June 16, 2026.";
+        claimBtn.disabled = true;
+      } else {
+        claimBtn.disabled = !eligible;
+        claimBtn.innerText = eligible ? "Claim Airdrop" : "Meet All Requirements to Claim";
+        presaleStatus.textContent = "✅ Presale ended — claim is now open.";
+      }
+    }
+
+    async function checkConnection() {
+      const wallet = await tonConnectUI.connected;
+      if (wallet && wallet.account?.address) {
+        connectedAddress = wallet.account.address;
+        document.getElementById("wallet-address").textContent = "Connected: " + connectedAddress.slice(0, 6) + "..." + connectedAddress.slice(-4);
+        const refLink = window.location.origin + window.location.pathname + "?ref=" + connectedAddress;
+        document.getElementById("ref-link").value = refLink;
+        simulateCheckEligibility(); // Check eligibility once connected
+      } else {
+        claimBtn.disabled = true;
+        claimBtn.innerText = "Connect Wallet to Claim";
+        document.getElementById("wallet-address").textContent = "Wallet Not Connected";
+      }
+    }
+
+    tonConnectUI.onStatusChange(wallet => {
+      if (wallet && wallet.account.address) {
+        connectedAddress = wallet.account.address;
+        document.getElementById("wallet-address").textContent = "Connected: " + connectedAddress.slice(0, 6) + "..." + connectedAddress.slice(-4);
+        const refLink = window.location.origin + window.location.pathname + "?ref=" + connectedAddress;
+        document.getElementById("ref-link").value = refLink;
+        simulateCheckEligibility(); // Check eligibility on status change
+      } else {
+        claimBtn.disabled = true;
+        claimBtn.innerText = "Connect Wallet to Claim";
+        document.getElementById("wallet-address").textContent = "Wallet Not Connected";
+      }
+    });
+
+    function copyRef() {
+      const input = document.getElementById("ref-link");
+      input.select();
+      input.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+      const statusElement = document.getElementById("status");
+      statusElement.textContent = "Referral link copied!";
+      setTimeout(() => { statusElement.textContent = ""; }, 3000); // Clear message after 3 seconds
+    }
+
+    function claim() {
+      // In a real application, this would trigger a blockchain transaction
+      document.getElementById("status").textContent = "✅ You have claimed 25,000 SPK!";
+      claimBtn.disabled = true; // Disable button after successful claim
+    }
+
+    // Attach click listener to claim button
+    claimBtn.addEventListener('click', claim);
+
+    window.onload = function() {
+        checkConnection(); // Initial connection check on page load
+        // Three.js 3D Background Setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('three-bg'), antialias: true, alpha: true });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+
+        const ambientLight = new THREE.AmbientLight(0x404040, 2); 
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(1, 1, 1).normalize();
+        scene.add(directionalLight);
+
+        const geometries = [
+            new THREE.TorusKnotGeometry(1, 0.4, 100, 16),
+            new THREE.SphereGeometry(1, 32, 32),
+            new THREE.BoxGeometry(1.5, 1.5, 1.5),
+            new THREE.OctahedronGeometry(1.2)
+        ];
+
+        const materials = [
+            new THREE.MeshStandardMaterial({ color: 0x9333ea, transparent: true, opacity: 0.6, roughness: 0.5, metalness: 0.8 }), 
+            new THREE.MeshStandardMaterial({ color: 0xec4899, transparent: true, opacity: 0.6, roughness: 0.5, metalness: 0.8 }), 
+            new THREE.MeshStandardMaterial({ color: 0x06b6d4, transparent: true, opacity: 0.6, roughness: 0.5, metalness: 0.8 }), 
+            new THREE.MeshStandardMaterial({ color: 0x6d28d9, transparent: true, opacity: 0.6, roughness: 0.5, metalness: 0.8 }) 
+        ];
+
+        const objects = [];
+        for (let i = 0; i < 10; i++) {
+            const geometry = geometries[Math.floor(Math.random() * geometries.length)];
+            const material = materials[Math.floor(Math.random() * materials.length)];
+            const mesh = new THREE.Mesh(geometry, material);
+
+            mesh.position.set(
+                (Math.random() - 0.5) * 20,
+                (Math.random() - 0.5) * 20,
+                (Math.random() - 0.5) * 20 - 10 
+            );
+            mesh.rotation.set(
+                Math.random() * Math.PI,
+                Math.random() * Math.PI,
+                Math.random() * Math.PI
+            );
+            mesh.scale.setScalar(0.5 + Math.random() * 1.5); 
+            scene.add(mesh);
+            objects.push(mesh);
+        }
+
+        camera.position.z = 5;
+
+        let mouseX = 0, mouseY = 0;
+        let targetX = 0, targetY = 0;
+        const windowHalfX = window.innerWidth / 2;
+        const windowHalfY = window.innerHeight / 2;
+
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX - windowHalfX) * 0.001;
+            mouseY = (event.clientY - windowHalfY) * 0.001;
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            targetX = mouseX * 0.5;
+            targetY = mouseY * 0.5;
+
+            camera.rotation.y += (targetX - camera.rotation.y) * 0.05;
+            camera.rotation.x += (targetY - camera.rotation.x) * 0.05;
+
+            objects.forEach(obj => {
+                obj.rotation.x += 0.001 + Math.random() * 0.001;
+                obj.rotation.y += 0.001 + Math.random() * 0.001;
+                obj.position.y += Math.sin(Date.now() * 0.0001 + obj.position.x) * 0.005; 
+                obj.position.x += Math.cos(Date.now() * 0.0001 + obj.position.y) * 0.005; 
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    };
+  </script>
 </body>
 </html>
