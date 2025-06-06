@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPK Airdrop & Presale - Claim Free Tokens!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+
+    <style>
+        /* Custom styles for Inter font and body background */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117; /* Dark background */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            color: #e2e8f0; /* Light text for dark background */
+        }
+
+        /* Canvas styling for 3D background */
+        #three-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Send to background */
+            opacity: 0.15; /* Subtle opacity */
+        }
+
+        /* Custom animation for glow effect */
+        @keyframes pulse-glow {
+            0%, 100% {
+                filter: brightness(1) drop-shadow(0 0 5px rgba(147, 51, 234, 0.5));
+            }
+            50% {
+                filter: brightness(1.2) drop-shadow(0 0 15px rgba(147, 51, 234, 0.8));
+            }
+        }
+        .animate-pulse-glow {
+            animation: pulse-glow 4s infinite ease-in-out;
+        }
+
+        /* Custom message box styles */
+        .message-box {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .message-box.hidden {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-20px);
+            pointer-events: none;
+        }
+        .message-box.success {
+            background-color: #10b981; /* Emerald 500 */
+            color: white;
+        }
+        .message-box.error {
+            background-color: #ef4444; /* Red 500 */
+            color: white;
+        }
+        .message-box.warning {
+            background-color: #F59E0B; /* Amber 500 */
+            color: white;
+        }
+
+        /* General fade-in animation */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-400 { animation-delay: 0.4s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        /* Responsive adjustments for the TON Connect button */
+        #ton-connect-button-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
+        }
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            #ton-connect-button-wrapper {
+                align-items: center;
+                width: 100%;
+            }
+        }
+
+        /* Presale specific styles */
+        .presale-countdown-item {
+            text-align: center;
+        }
+
+        .presale-countdown-item span {
+            font-size: 42px;
+            font-weight: 700;
+            color: #9333ea; /* Primary purple */
+        }
+
+        .presale-countdown-item small {
+            display: block;
+            font-size: 14px;
+            color: #94a3b8; /* Gray */
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        .progress-bar-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: #e2e8f0;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: #4a5568; /* Darker gray for empty bar */
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, #9333ea, #ec4899); /* Purple to Pink gradient */
+            border-radius: 10px;
+            transition: width 1s ease;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group label {
+            position: absolute;
+            left: 15px;
+            top: -10px;
+            background: #1f2937; /* Dark gray for label background */
+            padding: 0 10px;
+            font-size: 14px;
+            color: #9333ea; /* Primary purple */
+            font-weight: 500;
+            z-index: 1;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #4a5568; /* Darker gray border */
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background-color: #2d3748; /* Even darker gray for input background */
+            color: #e2e8f0;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #9333ea; /* Primary purple on focus */
+            box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.2);
+        }
+
+        .token-price-display {
+            text-align: center;
+            font-size: 20px;
+            margin: 20px 0;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .token-price-display span {
+            color: #9333ea; /* Primary purple */
+            font-size: 24px;
+        }
+        .transaction-status {
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 500;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .status-warning {
+            background-color: #fbbf24; /* Amber 400 */
+            color: #78350f; /* Amber 900 */
+        }
+        .status-success {
+            background-color: #34d399; /* Green 400 */
+            color: #065f46; /* Green 900 */
+        }
+        .status-error {
+            background-color: #ef4444; /* Red 500 */
+            color: #7f1d1d; /* Red 900 */
+        }
+    </style>
+</head>
+<body class="text-white flex flex-col min-h-screen">
+
+    <canvas id="three-bg"></canvas>
+
+    <div id="messageBox" class="message-box hidden"></div>
+
+    <nav class="p-6 flex justify-between items-center z-10 bg-gray-900 bg-opacity-70 backdrop-blur-sm shadow-lg rounded-b-xl">
+        <div class="flex items-center space-x-4">
+            <a href="#" class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 rounded-lg p-1">
+                SPK
+            </a>
+            <ul class="hidden md:flex space-x-8 text-lg">
+                <li><a href="#airdrop-section" class="hover:text-purple-400 transition-colors duration-300">Airdrop</a></li>
+                <li><a href="#presale-section" class="hover:text-purple-400 transition-colors duration-300">Presale</a></li>
+                <li><a href="#tokenomics" class="hover:text-purple-400 transition-colors duration-300">Tokenomics</a></li>
+                <li><a href="#roadmap" class="hover:text-purple-400 transition-colors duration-300">Roadmap</a></li>
+                <li><a href="https://docs.yourproject.com" target="_blank" rel="noopener noreferrer" class="hover:text-purple-400 transition-colors duration-300">Docs</a></li>
+            </ul>
+        </div>
+        <div id="ton-connect-button-wrapper">
+            <div id="ton-connect"></div>
+            <div id="wallet-status" class="text-gray-400 text-sm">Not Connected</div>
+        </div>
+    </nav>
+
+    <main id="airdrop-section" class="flex-grow flex items-center justify-center py-16 px-4 md:px-8 z-10">
+        <div class="bg-gray-800 bg-opacity-80 backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl border border-gray-700 max-w-3xl mx-auto text-center animate-fade-in-up">
+            <h1 class="text-5xl md:text-6xl font-extrabold leading-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-600 animate-pulse-glow">
+                Exclusive SPK Airdrop Event!
+            </h1>
+            <p class="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+                Claim your share of <span class="font-bold text-pink-400">1,000,000 SPK</span> tokens! Participate now before it's too late.
+            </p>
+
+            <div class="mb-10 p-6 bg-gray-700 rounded-xl shadow-inner border border-gray-600">
+                <h3 class="text-2xl font-bold text-purple-300 mb-4">Airdrop Ends In:</h3>
+                <div id="airdrop-countdown" class="text-4xl md:text-5xl font-mono font-extrabold text-green-400">
+                    <span id="airdrop-days">00</span>d <span id="airdrop-hours">00</span>h <span id="airdrop-minutes">00</span>m <span id="airdrop-seconds">00</span>s
+                </div>
+            </div>
+
+            <button id="claimAirdropBtn" class="w-full sm:w-auto bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-bold py-4 px-12 rounded-full text-xl shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-500 focus:ring-opacity-75">
+                Connect Wallet to Claim
+            </button>
+
+            <div id="airdrop-transaction-status" class="mt-4"></div>
+
+            <div class="mt-12 text-left">
+                <h3 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400 mb-6">How to Participate:</h3>
+                <ul class="list-disc list-inside text-gray-300 space-y-3 text-lg">
+                    <li>Connect your Web3 wallet (e.g., Tonkeeper, MetaMask).</li>
+                    <li>Ensure you have a small amount of native chain token (e.g., TON, ETH) for gas fees.</li>
+                    <li>Click "Claim Your Tokens Now!" to initiate the transaction.</li>
+                    <li>Confirm the transaction in your wallet.</li>
+                    <li>Tokens will be sent directly to your connected wallet address.</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <section id="presale-section" class="py-20 px-4 bg-gray-900">
+        <div class="max-w-3xl mx-auto bg-gray-800 bg-opacity-80 backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl border border-gray-700 text-center animate-fade-in-up">
+            <h2 class="text-4xl md:text-5xl font-bold mb-12 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
+                SPK Token Presale
+            </h2>
+
+            <div class="mb-10 p-6 bg-gray-700 rounded-xl shadow-inner border border-gray-600">
+                <h3 class="text-2xl font-bold text-purple-300 mb-4">Presale Ends In:</h3>
+                <div id="presale-countdown" class="text-4xl md:text-5xl font-mono font-extrabold text-green-400">
+                    <span id="presale-days">00</span>d <span id="presale-hours">00</span>h <span id="presale-minutes">00</span>m <span id="presale-seconds">00</span>s
+                </div>
+            </div>
+
+            <div class="progress-bar-container">
+                <div class="progress-label">
+                    <span>Raised: <strong id="raisedAmount">$1,250,000</strong></span>
+                    <span>Target: <strong id="targetAmount">$5,000,000</strong></span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress" id="presaleProgress" style="width: 25%;"></div>
+                </div>
+            </div>
+
+            <div class="presale-form mt-8">
+                <div class="input-group">
+                    <label for="usdtAmount">USDT Amount</label>
+                    <input type="number" id="usdtAmount" placeholder="10 to 1000 USDT" min="10" max="1000" class="w-full">
+                </div>
+                <button id="contribute-btn" class="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-bold py-4 px-12 rounded-full text-xl shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-500 focus:ring-opacity-75 mt-6" disabled>
+                    <span id="contribute-btn-normal-state"><i class="fas fa-coins mr-2"></i> Buy SPK Tokens</span>
+                    <span id="contribute-btn-processing-state" class="hidden">Processing... <i class="fas fa-spinner fa-spin ml-2"></i></span>
+                </button>
+                <div id="presale-transaction-status" class="mt-4"></div>
+                <p class="token-price-display">1 USDT = <span id="spk-token-rate">200 SPK</span></p>
+
+                <!-- New: Presale Claim Button -->
+                <button id="claim-presale-tokens-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-lg shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-75 mt-4" disabled>
+                    Claim Presale Tokens
+                </button>
+                <div id="presale-claim-status" class="mt-4 text-green-400 font-semibold"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="tokenomics" class="py-20 px-4 bg-gray-950">
+        <div class="max-w-6xl mx-auto text-center">
+            <h2 class="text-4xl md:text-5xl font-bold mb-12 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Tokenomics</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-700 hover:border-purple-500 transition-all duration-300 transform hover:-translate-y-2">
+                    <h3 class="text-2xl font-semibold mb-4 text-purple-300"><i class="fas fa-coins mr-2"></i> Presale</h3>
+                    <p class="text-gray-400">25% (500M SPK)<br>6mo cliff, 12mo vesting</p>
+                </div>
+                <div class="bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-700 hover:border-cyan-500 transition-all duration-300 transform hover:-translate-y-2">
+                    <h3 class="text-2xl font-semibold mb-4 text-cyan-300"><i class="fas fa-lock mr-2"></i> Liquidity</h3>
+                    <p class="text-gray-400">20% (400M SPK)<br>2 year lock</p>
+                </div>
+                <div class="bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-700 hover:border-pink-500 transition-all duration-300 transform hover:-translate-y-2">
+                    <h3 class="text-2xl font-semibold mb-4 text-pink-300"><i class="fas fa-chart-line mr-2"></i> Staking</h3>
+                    <p class="text-gray-400">15% (300M SPK)<br>48mo linear release</p>
+                </div>
+                <div class="bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-700 hover:border-green-500 transition-all duration-300 transform hover:-translate-y-2">
+                    <h3 class="text-2xl font-semibold mb-4 text-green-300"><i class="fas fa-cogs mr-2"></i> Ecosystem</h3>
+                    <p class="text-gray-400">15% (300M SPK)<br>DAO controlled</p>
+                </div>
+                <div class="bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-700 hover:border-yellow-500 transition-all duration-300 transform hover:-translate-y-2">
+                    <h3 class="text-2xl font-semibold mb-4 text-yellow-300"><i class="fas fa-users mr-2"></i> Team & Dev</h3>
+                    <p class="text-gray-400">10% (200M SPK)<br>12mo cliff, 24mo vesting</p>
+                </div>
+                <div class="bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-700 hover:border-red-500 transition-all duration-300 transform hover:-translate-y-2">
+                    <h3 class="text-2xl font-semibold mb-4 text-red-300"><i class="fas fa-bullhorn mr-2"></i> Marketing</h3>
+                    <p class="text-gray-400">8% (160M SPK)<br>25% TGE, 18mo linear</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="p-6 bg-gray-950 border-t border-gray-800 text-center text-gray-500 rounded-t-xl z-10">
+        <p class="mb-4">&copy; 2025 SPK Token. All rights reserved.</p>
+        <div class="flex justify-center space-x-6 text-2xl">
+            <a href="#" class="hover:text-purple-400 transition-colors duration-300">
+                <img src="https://placehold.co/24x24/000000/FFFFFF?text=X" alt="Twitter" class="inline-block w-6 h-6 rounded-full" />
+            </a>
+            <a href="#" class="hover:text-purple-400 transition-colors duration-300">
+                <img src="https://placehold.co/24x24/000000/FFFFFF?text=D" alt="Discord" class="inline-block w-6 h-6 rounded-full" />
+            </a>
+            <a href="#" class="hover:text-purple-400 transition-colors duration-300">
+                <img src="https://placehold.co/24x24/000000/FFFFFF?text=T" alt="Telegram" class="inline-block w-6 h-6 rounded-full" />
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        // --- Custom Message Box Functionality ---
+        const messageBox = document.getElementById('messageBox');
+        let messageTimeout;
+
+        function showMessage(message, type = 'success') {
+            clearTimeout(messageTimeout);
+            messageBox.innerHTML = `${type === 'success' ? '<i class="fas fa-check-circle mr-2"></i>' : type === 'error' ? '<i class="fas fa-exclamation-circle mr-2"></i>' : '<i class="fas fa-exclamation-triangle mr-2"></i>'} ${message}`;
+            messageBox.className = `message-box ${type}`; // Apply type class
+            messageBox.classList.remove('hidden');
+
+            messageTimeout = setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 5000); // Hide after 5 seconds
+        }
+
+        // --- Smart Contract Constants (Placeholders) ---
+        // In a real application, replace these with your actual deployed contract details.
+        const AIRDROP_CONTRACT_ADDRESS = "EQCD39VS5z_NY_m-bYk_J9Kk5P-uQ0zQ_Vb7iQ1o4n8-j7Xf"; // Example address
+        const PRESALE_CONTRACT_ADDRESS = "UQC6_hQoFH_S0zAnK2fFMuAxMIqgIssXjYuqtCJtKBKeN8sI"; // Updated address
+        // Simplified ABI for demonstration. Real ABI would be much larger and specific to your contract functions.
+        const CONTRACT_ABI = [
+            {
+                "name": "claimAirdrop",
+                "inputs": [],
+                "outputs": [],
+                "type": "function"
+            },
+            {
+                "name": "contributePresale",
+                "inputs": [],
+                "outputs": [],
+                "type": "function"
+            }
+        ];
+
+
+        // --- TON Connect Configuration ---
+        const tonConnectConfig = {
+            manifestUrl: "https://spk-presale-git-main-captsplufiks-projects.vercel.app/tonconnect-manifest.json",
+            buttonRootId: "ton-connect",
+            chain: 'mainnet', // Assuming mainnet for airdrop and presale
+        };
+
+        let tonConnectUI; // Declare globally for access
+        let connectedAddress = ""; // Global variable to store the connected wallet address
+        let presaleClaimed = false; // New state to track if presale tokens have been claimed
+
+        // --- Countdown End Dates (Global Declarations) ---
+        // Set the end date for the airdrop (e.g., 7 days from now)
+        const airdropEndDate = new Date();
+        airdropEndDate.setDate(airdropEndDate.getDate() + 7); 
+
+        // Set the end date for the presale (e.g., 15 days from now)
+        const presaleEndDate = new Date();
+        presaleEndDate.setDate(presaleEndDate.getDate() + 15); 
+
+
+        // Initialize TON Connect
+        async function initTonConnect() {
+            try {
+                tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+                    manifestUrl: tonConnectConfig.manifestUrl,
+                    buttonRootId: tonConnectConfig.buttonRootId,
+                    language: 'en',
+                    uiPreferences: {
+                        theme: 'DARK',
+                        colors: {
+                            light: {
+                                connectButton: {
+                                    background: '#4F46E5',
+                                    text: '#FFFFFF'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Attach status change listener after initial setup
+                attachTonConnectListeners();
+
+                // Check existing connection
+                tonConnectUI.connectionRestored.then((wallet) => {
+                    if (wallet) {
+                        console.log("Restored existing connection");
+                        // Status change listener will handle UI update
+                    } else {
+                        console.log("No existing connection found");
+                    }
+                }).catch((error) => {
+                    console.log("Error restoring connection:", error);
+                });
+
+            } catch (error) {
+                console.error('TON Connect initialization failed:', error);
+                // If initialization fails, show an error message.
+                // The manifest URL might be incorrect or inaccessible.
+                showMessage('Failed to initialize wallet system. Please check console for details and try again later.', 'error');
+            }
+        }
+
+        // Function to attach TON Connect listeners
+        function attachTonConnectListeners() {
+            const walletStatusElement = document.getElementById('wallet-status');
+            const claimAirdropBtn = document.getElementById('claimAirdropBtn');
+            const contributeBtn = document.getElementById('contribute-btn'); 
+            const claimPresaleTokensBtn = document.getElementById('claim-presale-tokens-btn'); // Get the new claim button
+
+            tonConnectUI.onStatusChange((wallet) => {
+                if (wallet) {
+                    connectedAddress = wallet.account.address; 
+                    const shortAddress = `${connectedAddress.slice(0, 6)}...${connectedAddress.slice(-4)}`;
+                    walletStatusElement.textContent = `Connected: ${shortAddress}`;
+                    walletStatusElement.classList.add('text-green-400'); 
+                    walletStatusElement.classList.remove('text-gray-400');
+
+                    // Update button states based on connection and time
+                    updateButtonStates();
+
+                    if (wallet.account.chain !== tonConnectConfig.chain) {
+                        showMessage(`Please switch to ${tonConnectConfig.chain} in your wallet.`, 'warning');
+                    } else {
+                        showMessage('Wallet connected and ready!', 'success');
+                    }
+                } else {
+                    connectedAddress = ""; 
+                    walletStatusElement.textContent = 'Not Connected';
+                    walletStatusElement.classList.remove('text-green-400');
+                    walletStatusElement.classList.add('text-gray-400');
+                    // Disable all buttons if not connected
+                    claimAirdropBtn.disabled = true;
+                    contributeBtn.disabled = true;
+                    claimPresaleTokensBtn.disabled = true;
+                    showMessage('Wallet disconnected.', 'warning');
+                }
+            });
+        }
+
+        // Initialize TON Connect and initial UI updates when DOM loads
+        document.addEventListener('DOMContentLoaded', () => {
+            initTonConnect();
+            // Initial calls to update countdowns and button states after DOM is loaded and variables are defined
+            updateAirdropCountdown(); 
+            updatePresaleCountdown();
+            updateButtonStates();
+        });
+
+
+        // --- Airdrop Countdown Timer Logic ---
+        const airdropCountdownElement = document.getElementById('airdrop-countdown');
+        const airdropDaysElement = document.getElementById('airdrop-days');
+        const airdropHoursElement = document.getElementById('airdrop-hours');
+        const airdropMinutesElement = document.getElementById('airdrop-minutes');
+        const airdropSecondsElement = document.getElementById('airdrop-seconds');
+
+        function updateAirdropCountdown() {
+            const now = new Date().getTime();
+            const distance = airdropEndDate.getTime() - now;
+
+            if (distance < 0) {
+                clearInterval(airdropCountdownInterval);
+                airdropCountdownElement.innerHTML = "<span class='text-red-500'>AIRDROP HAS ENDED!</span>";
+            } else {
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                airdropDaysElement.textContent = String(days).padStart(2, '0');
+                airdropHoursElement.textContent = String(hours).padStart(2, '0');
+                airdropMinutesElement.textContent = String(minutes).padStart(2, '0');
+                airdropSecondsElement.textContent = String(seconds).padStart(2, '0');
+            }
+            updateButtonStates(); // Update button states based on time
+        }
+
+        const airdropCountdownInterval = setInterval(updateAirdropCountdown, 1000);
+
+
+        // --- Presale Countdown Timer Logic ---
+        const presaleCountdownElement = document.getElementById('presale-countdown');
+        const presaleDaysElement = document.getElementById('presale-days');
+        const presaleHoursElement = document.getElementById('presale-hours');
+        const presaleMinutesElement = document.getElementById('presale-minutes');
+        const presaleSecondsElement = document.getElementById('presale-seconds');
+
+        function updatePresaleCountdown() {
+            const now = new Date().getTime();
+            const distance = presaleEndDate.getTime() - now;
+
+            if (distance < 0) {
+                clearInterval(presaleCountdownInterval);
+                presaleCountdownElement.innerHTML = "<span class='text-red-500'>PRESALE HAS ENDED!</span>";
+            } else {
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                presaleDaysElement.textContent = String(days).padStart(2, '0');
+                presaleHoursElement.textContent = String(hours).padStart(2, '0');
+                presaleMinutesElement.textContent = String(minutes).padStart(2, '0');
+                presaleSecondsElement.textContent = String(seconds).padStart(2, '0');
+            }
+            updateButtonStates(); // Update button states based on time
+        }
+
+        const presaleCountdownInterval = setInterval(updatePresaleCountdown, 1000);
+
+        // --- Master function to update all button states ---
+        function updateButtonStates() {
+            const now = new Date().getTime();
+            const isWalletConnected = tonConnectUI && tonConnectUI.connected;
+            const airdropEnded = now >= airdropEndDate.getTime();
+            const presaleEnded = now >= presaleEndDate.getTime();
+
+            const claimAirdropBtn = document.getElementById('claimAirdropBtn');
+            const contributeBtn = document.getElementById('contribute-btn');
+            const claimPresaleTokensBtn = document.getElementById('claim-presale-tokens-btn');
+
+            // Airdrop Button Logic
+            if (!isWalletConnected) {
+                claimAirdropBtn.disabled = true;
+                claimAirdropBtn.textContent = "Connect Wallet to Claim";
+            } else if (airdropEnded) {
+                claimAirdropBtn.disabled = true;
+                claimAirdropBtn.textContent = "Airdrop Ended";
+            } else {
+                // Assuming eligibility checks like 'purchased', 'referred', 'telegramJoined' are done elsewhere or simulated.
+                // For now, if connected and not ended, it's claimable (adjust as per actual eligibility rules)
+                claimAirdropBtn.disabled = false;
+                claimAirdropBtn.textContent = "Claim Airdrop";
+            }
+
+            // Presale Contribute Button Logic
+            if (!isWalletConnected) {
+                contributeBtn.disabled = true;
+                contributeBtn.textContent = "Connect Wallet to Buy";
+            } else if (presaleEnded) {
+                contributeBtn.disabled = true;
+                contributeBtn.textContent = "Presale Ended";
+            } else {
+                contributeBtn.disabled = false;
+                contributeBtn.textContent = "Buy SPK Tokens";
+            }
+
+            // Presale Claim Button Logic (NEW)
+            if (!isWalletConnected) {
+                claimPresaleTokensBtn.disabled = true;
+                claimPresaleTokensBtn.textContent = "Connect Wallet to Claim Presale";
+            } else if (!presaleEnded) {
+                claimPresaleTokensBtn.disabled = true;
+                claimPresaleTokensBtn.textContent = "Presale Claim Not Active Yet";
+            } else if (presaleClaimed) { // Check if already claimed
+                claimPresaleTokensBtn.disabled = true;
+                claimPresaleTokensBtn.textContent = "Presale Tokens Claimed!";
+            } else {
+                claimPresaleTokensBtn.disabled = false;
+                claimPresaleTokensBtn.textContent = "Claim Your Presale Tokens";
+            }
+        }
+
+
+        // --- Airdrop Claim Button Logic ---
+        document.getElementById('claimAirdropBtn').addEventListener('click', async () => {
+            if (!tonConnectUI || !tonConnectUI.connected) {
+                showMessage('Please connect your wallet first to claim tokens.', 'error');
+                return;
+            }
+            if (new Date().getTime() >= airdropEndDate.getTime()) {
+                showMessage('The airdrop has already ended.', 'error');
+                return;
+            }
+
+            const claimAirdropBtn = document.getElementById('claimAirdropBtn');
+            const transactionStatusDiv = document.getElementById('airdrop-transaction-status');
+
+            claimAirdropBtn.textContent = 'Claiming...';
+            claimAirdropBtn.disabled = true;
+            transactionStatusDiv.innerHTML = '<div class="transaction-status status-warning"><i class="fas fa-hourglass-half mr-2"></i> Initiating claim transaction...</div>';
+
+            try {
+                const tx = {
+                    validUntil: Math.floor(Date.now() / 1000) + 600, 
+                    messages: [{
+                        address: AIRDROP_CONTRACT_ADDRESS, 
+                        amount: '10000000', 
+                    }],
+                };
+                const result = await tonConnectUI.sendTransaction(tx);
+                console.log("Transaction sent:", result);
+
+                transactionStatusDiv.innerHTML = `<div class="transaction-status status-success"><i class="fas fa-check-circle mr-2"></i> Transaction sent! Hash: ${result.boc.slice(0, 10)}...</div>`;
+                showMessage('Airdrop claim transaction sent!', 'success');
+                
+                await new Promise(resolve => setTimeout(3000, resolve));
+
+                transactionStatusDiv.innerHTML = '<div class="transaction-status status-success"><i class="fas fa-check-circle mr-2"></i> SPK Airdrop claimed successfully! Tokens sent to your wallet.</div>';
+                showMessage('SPK Airdrop claimed successfully!', 'success');
+                claimAirdropBtn.textContent = 'Claimed!';
+                claimAirdropBtn.disabled = true; 
+
+            } catch (error) {
+                console.error("Airdrop claim failed:", error);
+                transactionStatusDiv.innerHTML = `<div class="transaction-status status-error"><i class="fas fa-exclamation-circle mr-2"></i> Claim failed: ${error.message || 'An unknown error occurred.'}</div>`;
+                showMessage(`Airdrop claim failed: ${error.message || 'Please try again.'}`, 'error');
+                claimAirdropBtn.textContent = 'Claim Again';
+                claimAirdropBtn.disabled = false; 
+            } finally {
+                updateButtonStates(); // Re-evaluate all button states
+            }
+        });
+
+        // --- Presale Contribution Logic ---
+        const usdtAmountInput = document.getElementById('usdtAmount');
+        const spkTokenRateDisplay = document.getElementById('spk-token-rate');
+        const presaleContributeBtn = document.getElementById('contribute-btn');
+        const presaleTransactionStatusDiv = document.getElementById('presale-transaction-status');
+        const presaleTokenRate = 200; 
+
+        const contributeBtnNormalState = document.getElementById('contribute-btn-normal-state');
+        const contributeBtnProcessingState = document.getElementById('contribute-btn-processing-state');
+
+
+        usdtAmountInput.addEventListener('input', (e) => {
+            let value = parseFloat(e.target.value);
+            
+            if (isNaN(value)) {
+                spkTokenRateDisplay.textContent = `${presaleTokenRate} SPK`; 
+                return;
+            }
+            
+            if (value < 10) {
+                value = 10;
+                e.target.value = 10; 
+            } else if (value > 1000) {
+                value = 1000;
+                e.target.value = 1000; 
+            }
+            
+            const tokenAmount = value * presaleTokenRate;
+            spkTokenRateDisplay.textContent = `${tokenAmount.toLocaleString()} SPK`;
+        });
+
+        presaleContributeBtn.addEventListener('click', async () => {
+            if (!tonConnectUI || !tonConnectUI.connected) {
+                showMessage('Please connect your wallet first to contribute.', 'error');
+                return;
+            }
+            if (new Date().getTime() >= presaleEndDate.getTime()) {
+                showMessage('The presale has already ended.', 'error');
+                return;
+            }
+
+            const amount = parseFloat(usdtAmountInput.value);
+            if (isNaN(amount) || amount < 10 || amount > 1000) {
+                showMessage('Please enter a valid amount between 10-1000 USDT.', 'error');
+                return;
+            }
+
+            contributeBtnNormalState.classList.add('hidden');
+            contributeBtnProcessingState.classList.remove('hidden');
+            presaleContributeBtn.disabled = true;
+            presaleTransactionStatusDiv.innerHTML = '<div class="transaction-status status-warning"><i class="fas fa-hourglass-half mr-2"></i> Processing contribution...</div>';
+
+            try {
+                const tonEquivalent = amount / 2.5; 
+                const tonNano = (tonEquivalent * 1e9).toFixed(0); 
+
+                const tx = {
+                    validUntil: Math.floor(Date.now() / 1000) + 600, 
+                    messages: [{
+                        address: PRESALE_CONTRACT_ADDRESS, 
+                        amount: tonNano
+                    }]
+                };
+
+                const result = await tonConnectUI.sendTransaction(tx);
+                console.log("Transaction sent:", result);
+                
+                presaleTransactionStatusDiv.innerHTML = `<div class="transaction-status status-success"><i class="fas fa-check-circle mr-2"></i> Sent ${tonEquivalent.toFixed(2)} TON to SPK presale wallet! You will be able to claim your SPK after presale ends.</div>`;
+                showMessage(`Successfully contributed ${amount} USDT! Your SPK will be claimable after presale ends.`, 'success');
+                usdtAmountInput.value = ''; 
+                spkTokenRateDisplay.textContent = `${presaleTokenRate} SPK`; 
+
+            } catch (error) {
+                console.error("Presale contribution failed:", error);
+                presaleTransactionStatusDiv.innerHTML = `<div class="transaction-status status-error"><i class="fas fa-exclamation-circle mr-2"></i> Transaction cancelled or failed.</div>`;
+                showMessage(`Contribution failed: ${error.message || 'Transaction cancelled or failed.'}`, 'error');
+            } finally {
+                contributeBtnNormalState.classList.remove('hidden');
+                contributeBtnProcessingState.classList.add('hidden');
+                presaleContributeBtn.disabled = false;
+                updateButtonStates(); // Re-evaluate all button states
+            }
+        });
+
+        // --- Presale Claim Button Logic ---
+        const claimPresaleTokensBtn = document.getElementById('claim-presale-tokens-btn'); 
+        const presaleClaimStatusDiv = document.getElementById('presale-claim-status'); 
+
+        claimPresaleTokensBtn.addEventListener('click', async () => {
+            if (!tonConnectUI || !tonConnectUI.connected) {
+                showMessage('Please connect your wallet to claim presale tokens.', 'error');
+                return;
+            }
+            if (new Date().getTime() < presaleEndDate.getTime()) {
+                showMessage('Presale claim is not yet active. Please wait until the presale ends.', 'warning');
+                return;
+            }
+            if (presaleClaimed) {
+                showMessage('You have already claimed your presale tokens.', 'warning');
+                return;
+            }
+
+            presaleClaimStatusDiv.textContent = "Processing Presale Token Claim... ";
+            claimPresaleTokensBtn.disabled = true;
+            claimPresaleTokensBtn.textContent = "Claiming...";
+
+            try {
+                const tx = {
+                    validUntil: Math.floor(Date.now() / 1000) + 600, 
+                    messages: [{
+                        address: PRESALE_CONTRACT_ADDRESS, // Or a separate vesting/claim contract
+                        amount: "5000000", // Small amount for gas/message value (0.005 TON)
+                    }]
+                };
+                const result = await tonConnectUI.sendTransaction(tx);
+                console.log("Presale claim transaction sent:", result);
+
+                presaleClaimStatusDiv.innerHTML = `✅ Presale tokens claimed successfully! Transaction Hash: ${result.boc.slice(0, 10)}...`;
+                showMessage('Presale tokens claimed successfully!', 'success');
+                claimPresaleTokensBtn.textContent = "Tokens Claimed!";
+                presaleClaimed = true; // Mark as claimed
+
+            } catch (error) {
+                console.error("Presale token claim failed:", error);
+                presaleClaimStatusDiv.innerHTML = `<div class="transaction-status status-error"><i class="fas fa-exclamation-circle mr-2"></i> Claim failed: ${error.message || 'Transaction cancelled or failed.'}</div>`;
+                showMessage(`Presale claim failed: ${error.message || 'Transaction cancelled or failed.'}`, 'error');
+            } finally {
+                updateButtonStates(); // Re-evaluate all button states
+            }
+        });
+
+
+        // --- Three.js 3D Background Setup ---
+        window.onload = function () {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('three-bg'), antialias: true, alpha: true });
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+
+            const ambientLight = new THREE.AmbientLight(0x404040, 2); 
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(1, 1, 1).normalize();
+            scene.add(directionalLight);
+
+            const geometries = [
+                new THREE.TorusKnotGeometry(1, 0.4, 100, 16),
+                new THREE.SphereGeometry(1, 32, 32),
+                new THREE.BoxGeometry(1.5, 1.5, 1.5),
+                new THREE.OctahedronGeometry(1.2)
+            ];
+
+            const materials = [
+                new THREE.MeshStandardMaterial({ color: 0x9333ea, transparent: true, opacity: 0.6, roughness: 0.5, metalness: 0.8 }), 
+                new THREE.MeshStandardMaterial({ color: 0xec4899, transparent: true, opacity: 0.6, roughness: 0.5, metalness: 0.8 }), 
+                new THREE.MeshStandardMaterial({ color: 0x06b6d4, transparent: true, opacity: 0.6, roughness: 0.5, metalness: 0.8 }), 
+                new THREE.MeshStandardMaterial({ color: 0x6d28d9, transparent: true, opacity: 0.6, roughness: 0.5, metalness: 0.8 }) 
+            ];
+
+            const objects = [];
+            for (let i = 0; i < 10; i++) {
+                const geometry = geometries[Math.floor(Math.random() * geometries.length)];
+                const material = materials[Math.floor(Math.random() * materials.length)];
+                const mesh = new THREE.Mesh(geometry, material);
+
+                mesh.position.set(
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20 - 10 
+                );
+                mesh.rotation.set(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                );
+                mesh.scale.setScalar(0.5 + Math.random() * 1.5); 
+                scene.add(mesh);
+                objects.push(mesh);
+            }
+
+            camera.position.z = 5;
+
+            let mouseX = 0, mouseY = 0;
+            let targetX = 0, targetY = 0;
+            const windowHalfX = window.innerWidth / 2;
+            const windowHalfY = window.innerHeight / 2;
+
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX - windowHalfX) * 0.001;
+                mouseY = (event.clientY - windowHalfY) * 0.001;
+            });
+
+            function animate() {
+                requestAnimationFrame(animate);
+
+                targetX = mouseX * 0.5;
+                targetY = mouseY * 0.5;
+
+                camera.rotation.y += (targetX - camera.rotation.y) * 0.05;
+                camera.rotation.x += (targetY - camera.rotation.x) * 0.05;
+
+                objects.forEach(obj => {
+                    obj.rotation.x += 0.001 + Math.random() * 0.001;
+                    obj.rotation.y += 0.001 + Math.random() * 0.001;
+                    obj.position.y += Math.sin(Date.now() * 0.0001 + obj.position.x) * 0.005; 
+                    obj.position.x += Math.cos(Date.now() * 0.0001 + obj.position.y) * 0.005; 
+                });
+
+                renderer.render(scene, camera);
+            }
+
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+    </script>
+</body>
+</html>
