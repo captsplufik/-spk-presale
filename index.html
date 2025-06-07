@@ -474,7 +474,17 @@
 
         // Global variables from Canvas environment (provided by the runtime)
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        
+const firebaseConfig = {
+  apiKey: "AIzaSyBQLJ8yVgrnchDkfpj8NF_aPiSDPDo2a_Q",
+  authDomain: "splufik-spk.firebaseapp.com",
+  projectId: "splufik-spk",
+  storageBucket: "splufik-spk.firebasestorage.app",
+  messagingSenderId: "67191790905",
+  appId: "1:67191790905:web:56ed3a7946e392cbe45ce8",
+  measurementId: "G-QGWXYKS7DS"
+};
+
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         const contributeBtn = document.getElementById("contribute-btn");
