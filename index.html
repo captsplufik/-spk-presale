@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPK Airdrop & Presale - Claim Free Tokens!</title>
+    <title>SPK Token Presale</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Three.js CDN -->
@@ -259,7 +259,6 @@
                 SPK
             </a>
             <ul class="hidden md:flex space-x-8 text-lg">
-                <li><a href="#airdrop-section" class="hover:text-purple-400 transition-colors duration-300">Airdrop</a></li>
                 <li><a href="#presale-section" class="hover:text-purple-400 transition-colors duration-300">Presale</a></li>
                 <li><a href="#tokenomics" class="hover:text-purple-400 transition-colors duration-300">Tokenomics</a></li>
                 <li><a href="#roadmap" class="hover:text-purple-400 transition-colors duration-300">Roadmap</a></li>
@@ -273,78 +272,16 @@
         </div>
     </nav>
 
-    <!-- Main Content Area (Airdrop Section) -->
-    <main id="airdrop-section" class="flex-grow flex items-center justify-center py-16 px-4 md:px-8 z-10">
-        <div class="bg-gray-800 bg-opacity-80 backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl border border-gray-700 max-w-3xl mx-auto text-center animate-fade-in-up">
-            <h1 class="text-5xl md:text-6xl font-extrabold leading-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-600 animate-pulse-glow">
-                Exclusive SPK Airdrop Event!
-            </h1>
-            <p class="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-                Claim your share of <span class="font-bold text-pink-400">25,000 SPK</span> tokens by connecting your wallet!
-            </p>
-
-            <!-- Countdown Timer -->
-            <div class="mb-10 p-6 bg-gray-700 rounded-xl shadow-inner border border-gray-600">
-                <h3 class="text-2xl font-bold text-purple-300 mb-4">Airdrop Ends In:</h3>
-                <div id="airdrop-countdown" class="text-4xl md:text-5xl font-mono font-extrabold text-green-400">
-                    <span id="airdrop-days">00</span>d <span id="airdrop-hours">00</span>h <span id="airdrop-minutes">00</span>m <span id="airdrop-seconds">00</span>s
-                </div>
-            </div>
-
-            <!-- Referral Link Section -->
-            <div class="mt-8 mb-8 p-6 bg-gray-700 rounded-xl shadow-inner border border-gray-600 text-left">
-                <h3 class="text-xl font-bold text-cyan-300 mb-3">Your Wallet Address:</h3>
-                <p id="wallet-address" class="text-lg text-gray-300 mb-4">Not Connected</p>
-                <h3 class="text-xl font-bold text-cyan-300 mb-3">Your Referral Link:</h3>
-                <div class="flex flex-col sm:flex-row items-center gap-3">
-                    <input type="text" id="ref-link" readonly class="flex-grow p-3 rounded-lg bg-gray-600 border border-gray-500 text-gray-200 text-sm sm:text-base cursor-pointer" value="Connect wallet to generate referral link">
-                    <button onclick="copyRef()" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-all duration-300">
-                        Copy Link
-                    </button>
-                </div>
-            </div>
-
-            <!-- Airdrop Eligibility Status -->
-            <div id="airdrop-eligibility-status" style="text-align: left; margin: 20px auto; max-width: 400px;">
-                <p id="purchase-status" class="text-gray-300">🔄 Checking purchase status...</p>
-                <p id="referral-status" class="text-gray-300">🔄 Checking referrals...</p>
-                <p id="telegram-status" class="text-gray-300">🔄 Checking Telegram...</p>
-            </div>
-
-            <!-- Call to Action -->
-            <button id="claim-btn" class="w-full sm:w-auto bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-bold py-4 px-12 rounded-full text-xl shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-500 focus:ring-opacity-75" disabled>
-                Connect Wallet to Claim
-            </button>
-
-            <!-- Transaction Status Display for Airdrop -->
-            <div id="airdrop-transaction-status" class="mt-4"></div>
-            <p id="status" class="mt-4 text-green-400 font-semibold"></p>
-
-
-            <!-- How to Participate -->
-            <div class="mt-12 text-left">
-                <h3 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400 mb-6">How to Participate:</h3>
-                <ul class="list-disc list-inside text-gray-300 space-y-3 text-lg">
-                    <li>Connect your Web3 wallet (e.g., Tonkeeper, MetaMask).</li>
-                    <li>Ensure you have a small amount of native chain token (e.g., TON, ETH) for gas fees.</li>
-                    <li>Click "Claim Your Tokens Now!" to initiate the transaction.</li>
-                    <li>Confirm the transaction in your wallet.</li>
-                    <li>Tokens will be sent directly to your connected wallet address.</li>
-                </ul>
-            </div>
-        </div>
-    </main>
-
-    <!-- Presale Section -->
-    <section id="presale-section" class="py-20 px-4 bg-gray-900">
-        <div class="max-w-3xl mx-auto bg-gray-800 bg-opacity-80 backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl border border-gray-700 text-center animate-fade-in-up">
+    <!-- Main Content Area (Now starts with Presale Section) -->
+    <main class="flex-grow flex items-center justify-center py-16 px-4 md:px-8 z-10">
+        <section id="presale-section" class="max-w-3xl mx-auto bg-gray-800 bg-opacity-80 backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl border border-gray-700 text-center animate-fade-in-up">
             <h2 class="text-4xl md:text-5xl font-bold mb-12 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
                 SPK Token Presale
             </h2>
 
             <!-- Presale Countdown -->
             <div class="mb-10 p-6 bg-gray-700 rounded-xl shadow-inner border border-gray-600">
-                <h3 class="text-2xl font-bold text-purple-300 mb-4">Presale Ends In:</h3>
+                <h3 id="presale-countdown-title" class="text-2xl font-bold text-purple-300 mb-4">Presale Starts In:</h3>
                 <div id="presale-countdown" class="text-4xl md:text-5xl font-mono font-extrabold text-green-400">
                     <span id="presale-days">00</span>d <span id="presale-hours">00</span>h <span id="presale-minutes">00</span>m <span id="presale-seconds">00</span>s
                 </div>
@@ -353,7 +290,7 @@
             <!-- Progress Bar -->
             <div class="progress-bar-container">
                 <div class="progress-label">
-                    <span>Raised: <strong id="raisedAmount">$1,250,000</strong></span>
+                    <span>Raised: <strong id="raisedAmount">$20,000</strong></span>
                     <span>Target: <strong id="targetAmount">$5,000,000</strong></span>
                 </div>
                 <div class="progress-bar">
@@ -374,16 +311,16 @@
                 <div id="presale-transaction-status" class="mt-4"></div>
                 <p class="token-price-display">1 USDT = <span id="spk-token-rate">200 SPK</span></p>
 
-                <!-- New: Presale Claim Button -->
+                <!-- Presale Claim Button -->
                 <button id="claim-presale-tokens-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-lg shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-75 mt-4" disabled>
                     Claim Presale Tokens
                 </button>
                 <div id="presale-claim-status" class="mt-4 text-green-400 font-semibold"></div>
             </div>
-        </div>
-    </section>
+        </section>
+    </main>
 
-    <!-- Tokenomics Section (from original data) -->
+    <!-- Tokenomics Section -->
     <section id="tokenomics" class="py-20 px-4 bg-gray-950">
         <div class="max-w-6xl mx-auto text-center">
             <h2 class="text-4xl md:text-5xl font-bold mb-12 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Tokenomics</h2>
@@ -416,7 +353,7 @@
         </div>
     </section>
 
-    <!-- Roadmap Section (from original data) -->
+    <!-- Roadmap Section -->
     <section id="roadmap" class="py-20 px-4 bg-gray-950">
         <div class="max-w-6xl mx-auto text-center">
             <h2 class="text-4xl md:text-5xl font-bold mb-12 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-600">Roadmap</h2>
@@ -485,17 +422,8 @@
         }
 
         // --- Smart Contract Constants (Placeholders) ---
-        // In a real application, replace these with your actual deployed contract details.
-        const AIRDROP_CONTRACT_ADDRESS = "EQCD39VS5z_NY_m-bYk_J9Kk5P-uQ0zQ_Vb7iQ1o4n8-j7Xf"; // Example address
         const PRESALE_CONTRACT_ADDRESS = "EQA0o000000000000000000000000000000000000000000000000000000000000000"; // Example address
-        // Simplified ABI for demonstration. Real ABI would be much larger and specific to your contract functions.
         const CONTRACT_ABI = [
-            {
-                "name": "claimAirdrop",
-                "inputs": [],
-                "outputs": [],
-                "type": "function"
-            },
             {
                 "name": "contributePresale",
                 "inputs": [],
@@ -509,88 +437,21 @@
         const tonConnectConfig = {
             manifestUrl: "https://splufik.vercel.app/tonconnect-manifest.json",
             buttonRootId: "ton-connect",
-            chain: 'mainnet', // Assuming mainnet for airdrop and presale
+            chain: 'mainnet',
         };
 
-        let tonConnectUI; // Declare globally for access
-        let purchased = false;
-        let referred = false;
-        let telegramJoined = false;
-        let connectedAddress = "";
+        let tonConnectUI;
+        let presaleClaimed = false;
 
-        const claimBtn = document.getElementById("claim-btn"); // Get the airdrop claim button
-        const contributeBtn = document.getElementById("contribute-btn"); // Presale button
-        const claimPresaleTokensBtn = document.getElementById("claim-presale-tokens-btn"); // New: Presale Claim Button
+        const contributeBtn = document.getElementById("contribute-btn");
+        const claimPresaleTokensBtn = document.getElementById("claim-presale-tokens-btn");
 
-        // Simulate eligibility check
-        function simulateCheckEligibility() {
-            // These are placeholder conditions — replace with real API calls later
-            purchased = true;
-            referred = true;
-            telegramJoined = true;
+        // --- Countdown Dates (Global Declarations) ---
+        // Presale begins on June 16, 2025
+        const presaleStartDate = new Date("2025-06-16T00:00:00Z");
 
-            updateEligibilityDisplay();
-        }
-
-        // Update UI based on eligibility
-        function updateEligibilityDisplay() {
-            const isWalletConnected = tonConnectUI && tonConnectUI.connected;
-            const now = new Date().getTime();
-
-            // Airdrop eligibility display
-            if (!isWalletConnected) {
-                document.getElementById("purchase-status").textContent = "❌ Connect wallet to check eligibility";
-                document.getElementById("referral-status").textContent = ""; // Clear if not connected
-                document.getElementById("telegram-status").textContent = ""; // Clear if not connected
-                claimBtn.disabled = true;
-                claimBtn.textContent = "Connect Wallet to Claim";
-            } else {
-                document.getElementById("purchase-status").textContent = purchased
-                    ? "✅ Bought 5,000+ SPK"
-                    : "❌ Buy at least 5,000 SPK";
-                document.getElementById("referral-status").textContent = referred
-                    ? "✅ Referred 3+ users"
-                    : "❌ Refer at least 3 people";
-                document.getElementById("telegram-status").textContent = telegramJoined
-                    ? "✅ Joined Telegram"
-                    : "❌ Join Telegram group";
-
-                const eligibleForAirdropCriteria = purchased && referred && telegramJoined;
-                const airdropAvailableDuringPeriod = now < airdropEndDate.getTime();
-                const airdropAvailableAfterPresale = now >= presaleEndDate.getTime(); // New condition
-
-                const eligibleForAirdrop = eligibleForAirdropCriteria && (airdropAvailableDuringPeriod || airdropAvailableAfterPresale);
-                
-                if (eligibleForAirdrop) {
-                    claimBtn.disabled = false;
-                    claimBtn.textContent = "Claim Airdrop";
-                } else {
-                    claimBtn.disabled = true;
-                    if (!eligibleForAirdropCriteria) {
-                        claimBtn.textContent = "Meet All Requirements to Claim";
-                    } else if (now >= airdropEndDate.getTime() && now < presaleEndDate.getTime()) {
-                        claimBtn.textContent = "Airdrop Ended (Wait for Presale End)";
-                    } else {
-                        claimBtn.textContent = "Airdrop Ended";
-                    }
-                }
-            }
-
-            // Presale buttons state based on wallet connection and time
-            contributeBtn.disabled = !isWalletConnected || now >= presaleEndDate.getTime();
-            if (now >= presaleEndDate.getTime()) {
-                contributeBtn.textContent = "Presale Ended";
-            } else {
-                contributeBtn.textContent = "Buy SPK Tokens";
-            }
-
-            claimPresaleTokensBtn.disabled = !isWalletConnected || now < presaleEndDate.getTime();
-            if (now < presaleEndDate.getTime()) {
-                claimPresaleTokensBtn.textContent = "Presale Claim Not Active";
-            } else {
-                claimPresaleTokensBtn.textContent = "Claim Your Presale Tokens";
-            }
-        }
+        // Presale ends on June 17, 2026
+        const presaleEndDate = new Date("2026-06-17T00:00:00Z");
 
 
         // Initialize TON Connect
@@ -613,43 +474,38 @@
                     }
                 });
 
-                // React to status change from TonConnect
                 tonConnectUI.onStatusChange(wallet => {
                     const walletStatusElement = document.getElementById("wallet-status");
                     
                     if (wallet && wallet.account.address) {
-                        connectedAddress = wallet.account.address;
-                        const shortAddress = `${connectedAddress.slice(0, 6)}...${connectedAddress.slice(-4)}`;
+                        const shortAddress = `${wallet.account.address.slice(0, 6)}...${wallet.account.address.slice(-4)}`;
                         walletStatusElement.textContent = `Connected: ${shortAddress}`;
                         walletStatusElement.classList.add('text-green-400');
                         walletStatusElement.classList.remove('text-gray-400');
-
-                        const refLink = window.location.origin + window.location.pathname + "?ref=" + connectedAddress;
-                        document.getElementById("ref-link").value = refLink;
                         
-                        simulateCheckEligibility(); // Re-evaluate eligibility based on new connection state
+                        updateButtonStates();
                         showMessage('Wallet connected and ready!', 'success');
 
                     } else {
-                        connectedAddress = "";
                         walletStatusElement.textContent = 'Not Connected';
                         walletStatusElement.classList.remove('text-green-400');
                         walletStatusElement.classList.add('text-gray-400');
-
-                        document.getElementById("ref-link").value = "Connect wallet to generate referral link"; // Reset referral link
-
-                        disableClaimButton(); // This will call updateEligibilityDisplay
+                        
+                        disableButtons();
                         showMessage('Wallet disconnected.', 'warning');
                     }
                 });
 
-                // Trigger an initial check for connection status after TonConnectUI is initialized
-                const initialWallet = await tonConnectUI.connected;
-                if (initialWallet && initialWallet.account?.address) {
-                     // onStatusChange will handle this
-                } else {
-                    disableClaimButton(); // Manually trigger disable if no initial connection found
-                }
+                tonConnectUI.ready.then(() => {
+                    if (tonConnectUI.connected) {
+                        tonConnectUI.onStatusChange(tonConnectUI.wallet);
+                    } else {
+                        disableButtons();
+                    }
+                }).catch(error => {
+                    console.error("Error during TON Connect UI ready state check:", error);
+                    showMessage("Failed to initialize wallet connection. Please try refreshing.", 'error');
+                });
 
             } catch (error) {
                 console.error('TON Connect initialization failed:', error);
@@ -657,123 +513,60 @@
             }
         }
 
+        // A helper function to disable buttons and reset related UI elements when wallet is disconnected
+        function disableButtons() {
+            contributeBtn.disabled = true;
+            contributeBtn.textContent = "Connect Wallet to Buy";
+            claimPresaleTokensBtn.disabled = true;
+            claimPresaleTokensBtn.textContent = "Connect Wallet to Claim Presale";
+            document.getElementById("wallet-status").textContent = "Not Connected";
+            updateButtonStates(); // Re-evaluate button states for display
+        }
+
+
+        // --- Master function to update all button states ---
+        function updateButtonStates() {
+            const now = new Date().getTime();
+            const isWalletConnected = tonConnectUI && tonConnectUI.connected;
+            const presaleHasStarted = now >= presaleStartDate.getTime();
+            const presaleHasEnded = now >= presaleEndDate.getTime();
+
+            // Presale Contribute Button Logic
+            if (!isWalletConnected) {
+                contributeBtn.disabled = true;
+                contributeBtn.textContent = "Connect Wallet to Buy";
+            } else if (!presaleHasStarted) {
+                contributeBtn.disabled = true;
+                contributeBtn.textContent = "Presale Not Started Yet";
+            } else if (presaleHasEnded) {
+                contributeBtn.disabled = true;
+                contributeBtn.textContent = "Presale Ended";
+            } else {
+                contributeBtn.disabled = false;
+                contributeBtn.textContent = "Buy SPK Tokens";
+            }
+
+            // Presale Claim Button Logic
+            if (!isWalletConnected) {
+                claimPresaleTokensBtn.disabled = true;
+                claimPresaleTokensBtn.textContent = "Connect Wallet to Claim Presale";
+            } else if (!presaleHasEnded) {
+                claimPresaleTokensBtn.disabled = true;
+                claimPresaleTokensBtn.textContent = "Claim Not Active Yet (Presale Ongoing)";
+            } else if (presaleClaimed) { // Check if already claimed
+                claimPresaleTokensBtn.disabled = true;
+                claimPresaleTokensBtn.textContent = "Presale Tokens Claimed!";
+            } else {
+                claimPresaleTokensBtn.disabled = false;
+                claimPresaleTokensBtn.textContent = "Claim Your Presale Tokens";
+            }
+        }
+
         // Initialize TON Connect and other initial UI updates when DOM loads
         document.addEventListener('DOMContentLoaded', () => {
             initTonConnect();
-            simulateCheckEligibility(); // Initial call to update eligibility display
+            updatePresaleCountdown(); // Initial call to update presale countdown
         });
-
-
-        // --- Referral Link Copy Function ---
-        function copyRef() {
-            const input = document.getElementById("ref-link");
-            input.select();
-            input.setSelectionRange(0, 99999); // For mobile devices
-            document.execCommand("copy");
-            showMessage("Referral link copied!", "success");
-        }
-
-        // A helper function to disable buttons and reset related UI elements when wallet is disconnected
-        function disableClaimButton() {
-            claimBtn.disabled = true;
-            claimBtn.textContent = "Connect Wallet to Claim";
-            document.getElementById("wallet-address").textContent = "Not Connected";
-            document.getElementById("ref-link").value = "Connect wallet to generate referral link";
-            contributeBtn.disabled = true;
-            claimPresaleTokensBtn.disabled = true; // Disable new claim button too
-            updateEligibilityDisplay(); // Update eligibility display to reflect disconnected state
-        }
-
-
-        // Airdrop claim function
-        document.getElementById('claim-btn').addEventListener('click', async () => {
-            if (!tonConnectUI || !tonConnectUI.connected) {
-                showMessage('Please connect your wallet to claim the airdrop.', 'error');
-                return;
-            }
-            if (!purchased || !referred || !telegramJoined) {
-                showMessage('You must meet all eligibility requirements to claim the airdrop.', 'error');
-                return;
-            }
-
-            const statusElement = document.getElementById("status");
-            statusElement.textContent = "Processing Airdrop Claim... ";
-            claimBtn.disabled = true;
-            claimBtn.textContent = "Claiming...";
-            document.getElementById('airdrop-transaction-status').innerHTML = '<div class="transaction-status status-warning"><i class="fas fa-hourglass-half mr-2"></i> Initiating claim transaction...</div>';
-
-            try {
-                // Simulate sending a transaction to the airdrop smart contract
-                const tx = {
-                    validUntil: Math.floor(Date.now() / 1000) + 600, // 10 minutes from now
-                    messages: [{
-                        address: AIRDROP_CONTRACT_ADDRESS,
-                        amount: "10000000", // Small amount for gas/message value (0.01 TON)
-                    }]
-                };
-                await tonConnectUI.sendTransaction(tx);
-
-                statusElement.textContent = "✅ You have claimed 25,000 SPK!";
-                claimBtn.textContent = "Claimed!";
-                document.getElementById('airdrop-transaction-status').innerHTML = '<div class="transaction-status status-success"><i class="fas fa-check-circle mr-2"></i> SPK Airdrop claimed successfully!</div>';
-                showMessage('SPK Airdrop claimed successfully!', 'success');
-                
-                // For a real scenario, you'd query the smart contract for claim status.
-                // For this simulation, we'll keep the eligibility criteria for airdrop as true for now.
-                // If it's a one-time claim per address, you'd mark it as claimed in backend/smart contract.
-
-            } catch (error) {
-                console.error("Airdrop claim failed:", error);
-                statusElement.textContent = "❌ Claim failed.";
-                document.getElementById('airdrop-transaction-status').innerHTML = `<div class="transaction-status status-error"><i class="fas fa-exclamation-circle mr-2"></i> Claim failed: ${error.message || 'Transaction cancelled or failed.'}</div>`;
-                showMessage(`Airdrop claim failed: ${error.message || 'Transaction cancelled or failed.'}`, 'error');
-            } finally {
-                // Keep the button disabled if claimed successfully, otherwise re-enable to allow retries
-                if (statusElement.textContent.includes("Claimed!")) {
-                    claimBtn.disabled = true;
-                } else {
-                    claimBtn.disabled = false;
-                    claimBtn.textContent = "Claim Airdrop"; // Reset text
-                }
-                updateEligibilityDisplay(); // Ensure display reflects actual state after attempt
-            }
-        });
-
-
-        // --- Airdrop Countdown Timer Logic ---
-        const airdropCountdownElement = document.getElementById('airdrop-countdown');
-        const airdropDaysElement = document.getElementById('airdrop-days');
-        const airdropHoursElement = document.getElementById('airdrop-hours');
-        const airdropMinutesElement = document.getElementById('airdrop-minutes');
-        const airdropSecondsElement = document.getElementById('airdrop-seconds');
-
-        const airdropEndDate = new Date();
-        airdropEndDate.setDate(airdropEndDate.getDate() + 7); // Airdrop ends in 7 days from now
-
-        function updateAirdropCountdown() {
-            const now = new Date().getTime();
-            const distance = airdropEndDate.getTime() - now;
-
-            if (distance < 0) {
-                // Airdrop period is over
-                airdropCountdownElement.innerHTML = "<span class='text-red-500'>AIRDROP HAS ENDED!</span>";
-                // Don't disable claimBtn here, updateEligibilityDisplay will handle it based on presale end
-            } else {
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                airdropDaysElement.textContent = String(days).padStart(2, '0');
-                airdropHoursElement.textContent = String(hours).padStart(2, '0');
-                airdropMinutesElement.textContent = String(minutes).padStart(2, '0');
-                airdropSecondsElement.textContent = String(seconds).padStart(2, '0');
-            }
-            updateEligibilityDisplay(); // Re-evaluate airdrop button state frequently
-        }
-
-        const airdropCountdownInterval = setInterval(updateAirdropCountdown, 1000);
-        updateAirdropCountdown();
 
 
         // --- Presale Countdown Timer Logic ---
@@ -782,15 +575,33 @@
         const presaleHoursElement = document.getElementById('presale-hours');
         const presaleMinutesElement = document.getElementById('presale-minutes');
         const presaleSecondsElement = document.getElementById('presale-seconds');
+        const presaleCountdownTitle = document.getElementById('presale-countdown-title'); // Get the title element
 
-        const presaleEndDate = new Date();
-        presaleEndDate.setDate(presaleEndDate.getDate() + 15); // Presale ends in 15 days from now
 
         function updatePresaleCountdown() {
             const now = new Date().getTime();
-            const distance = presaleEndDate.getTime() - now;
+            let distance;
+            let titleText = "";
+            let timerExpired = false;
 
-            if (distance < 0) {
+            if (now < presaleStartDate.getTime()) {
+                // Presale has not started yet
+                distance = presaleStartDate.getTime() - now;
+                titleText = "Presale Starts In:";
+            } else if (now >= presaleStartDate.getTime() && now < presaleEndDate.getTime()) {
+                // Presale is ongoing
+                distance = presaleEndDate.getTime() - now;
+                titleText = "Presale Ends In:";
+            } else {
+                // Presale has ended
+                distance = -1; // Indicate expired
+                titleText = "Presale Has Ended!";
+                timerExpired = true;
+            }
+
+            presaleCountdownTitle.textContent = titleText; // Update the title dynamically
+
+            if (timerExpired) {
                 clearInterval(presaleCountdownInterval);
                 presaleCountdownElement.innerHTML = "<span class='text-red-500'>PRESALE HAS ENDED!</span>";
             } else {
@@ -804,11 +615,11 @@
                 presaleMinutesElement.textContent = String(minutes).padStart(2, '0');
                 presaleSecondsElement.textContent = String(seconds).padStart(2, '0');
             }
-            updateEligibilityDisplay(); // Re-evaluate presale buttons state frequently
+            updateButtonStates(); // Update button states based on time
         }
 
         const presaleCountdownInterval = setInterval(updatePresaleCountdown, 1000);
-        updatePresaleCountdown();
+        updatePresaleCountdown(); // Initial call
 
 
         // --- Presale Contribution Logic ---
@@ -844,6 +655,10 @@
         contributeBtn.addEventListener('click', async () => {
             if (!tonConnectUI || !tonConnectUI.connected) {
                 showMessage('Please connect your wallet first to contribute.', 'error');
+                return;
+            }
+            if (new Date().getTime() < presaleStartDate.getTime()) {
+                showMessage('Presale has not started yet. Please wait.', 'warning');
                 return;
             }
             if (new Date().getTime() >= presaleEndDate.getTime()) {
@@ -883,10 +698,6 @@
                 usdtAmountInput.value = '';
                 spkTokenRateDisplay.textContent = `${presaleTokenRate} SPK`;
 
-                // After successful purchase, update the 'purchased' eligibility for airdrop
-                purchased = true;
-                updateEligibilityDisplay(); // Re-evaluate airdrop eligibility
-
             } catch (error) {
                 console.error("Presale contribution failed:", error);
                 presaleTransactionStatusDiv.innerHTML = `<div class="transaction-status status-error"><i class="fas fa-exclamation-circle mr-2"></i> Transaction cancelled or failed.</div>`;
@@ -896,11 +707,11 @@
                 contributeBtnNormalState.classList.remove('hidden');
                 contributeBtnProcessingState.classList.add('hidden');
                 contributeBtn.disabled = false;
-                updateEligibilityDisplay(); // Ensure display reflects actual state after attempt
+                updateButtonStates(); // Ensure display reflects actual state after attempt
             }
         });
 
-        // New: Presale Claim Button Logic
+        // Presale Claim Button Logic
         claimPresaleTokensBtn.addEventListener('click', async () => {
             if (!tonConnectUI || !tonConnectUI.connected) {
                 showMessage('Please connect your wallet to claim presale tokens.', 'error');
@@ -910,6 +721,10 @@
                 showMessage('Presale claim is not yet active. Please wait until the presale ends.', 'warning');
                 return;
             }
+            if (presaleClaimed) {
+                showMessage('You have already claimed your presale tokens.', 'warning');
+                return;
+            }
 
             const presaleClaimStatusDiv = document.getElementById('presale-claim-status');
             presaleClaimStatusDiv.textContent = "Processing Presale Token Claim... ";
@@ -917,14 +732,11 @@
             claimPresaleTokensBtn.textContent = "Claiming...";
 
             try {
-                // Simulate sending a transaction to the smart contract to claim presale tokens
-                // This would typically be a call to a 'claim' function on your vesting/presale contract.
                 const tx = {
-                    validUntil: Math.floor(Date.now() / 1000) + 600, // 10 minutes from now
+                    validUntil: Math.floor(Date.now() / 1000) + 600,
                     messages: [{
-                        address: PRESALE_CONTRACT_ADDRESS, // Or a separate vesting/claim contract
-                        amount: "5000000", // Small amount for gas/message value (0.005 TON)
-                        // payload: if your contract requires a specific payload for claiming
+                        address: PRESALE_CONTRACT_ADDRESS,
+                        amount: "5000000",
                     }]
                 };
                 await tonConnectUI.sendTransaction(tx);
@@ -932,8 +744,8 @@
                 presaleClaimStatusDiv.textContent = "✅ Presale tokens claimed successfully!";
                 claimPresaleTokensBtn.textContent = "Tokens Claimed!";
                 showMessage('Presale tokens claimed successfully!', 'success');
+                presaleClaimed = true;
 
-                // In a real dApp, you'd track claimed status and disable subsequent claims for this user.
             } catch (error) {
                 console.error("Presale token claim failed:", error);
                 presaleClaimStatusDiv.innerHTML = `<div class="transaction-status status-error"><i class="fas fa-exclamation-circle mr-2"></i> Claim failed: ${error.message || 'Transaction cancelled or failed.'}</div>`;
@@ -945,13 +757,12 @@
                     claimPresaleTokensBtn.disabled = false;
                     claimPresaleTokensBtn.textContent = "Claim Presale Tokens";
                 }
-                updateEligibilityDisplay();
+                updateButtonStates();
             }
         });
 
 
         // --- Three.js 3D Background Setup ---
-        // This function runs when the window has fully loaded all assets
         window.onload = function () {
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -960,16 +771,13 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
 
-            // Add ambient light
             const ambientLight = new THREE.AmbientLight(0x404040, 2);
             scene.add(ambientLight);
 
-            // Add a directional light
             const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
             directionalLight.position.set(1, 1, 1).normalize();
             scene.add(directionalLight);
 
-            // Create multiple abstract shapes
             const geometries = [
                 new THREE.TorusKnotGeometry(1, 0.4, 100, 16),
                 new THREE.SphereGeometry(1, 32, 32),
@@ -1007,7 +815,6 @@
 
             camera.position.z = 5;
 
-            // Mouse interaction for subtle camera movement
             let mouseX = 0, mouseY = 0;
             let targetX = 0, targetY = 0;
             const windowHalfX = window.innerWidth / 2;
@@ -1018,7 +825,6 @@
                 mouseY = (event.clientY - windowHalfY) * 0.001;
             });
 
-            // Animation loop
             function animate() {
                 requestAnimationFrame(animate);
 
@@ -1040,7 +846,6 @@
 
             animate();
 
-            // Handle window resize
             window.addEventListener('resize', () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
