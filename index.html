@@ -15,6 +15,28 @@
     <!-- TON Connect UI SDK -->
     <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global Firebase variables, initialized in a separate script block
+        window.firebase = {
+            initializeApp,
+            getAuth,
+            signInAnonymously,
+            signInWithCustomToken,
+            onAuthStateChanged,
+            getFirestore,
+            doc,
+            getDoc,
+            setDoc,
+            updateDoc,
+            onSnapshot,
+            increment
+        };
+    </script>
 
     <style>
         /* Custom styles for Inter font and body background */
@@ -269,6 +291,7 @@
             <!-- TON Connect UI Button will be rendered here -->
             <div id="ton-connect"></div>
             <div id="wallet-status" class="text-gray-400 text-sm">Not Connected</div>
+            <div id="user-id-display" class="text-gray-400 text-xs mt-1">User ID: N/A</div>
         </div>
     </nav>
 
@@ -441,10 +464,26 @@
         };
 
         let tonConnectUI;
-        let presaleClaimed = false;
+        let presaleClaimed = false; // Client-side flag for claim status
+
+        // Firebase variables
+        let db;
+        let auth;
+        let currentUserId = null;
+        let isAuthReady = false; // Flag to indicate Firebase auth is ready
+
+        // Global variables from Canvas environment (provided by the runtime)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         const contributeBtn = document.getElementById("contribute-btn");
         const claimPresaleTokensBtn = document.getElementById("claim-presale-tokens-btn");
+        const raisedAmountElement = document.getElementById('raisedAmount');
+        const targetAmountElement = document.getElementById('targetAmount');
+        const presaleProgressElement = document.getElementById('presaleProgress');
+        const userIdDisplayElement = document.getElementById('user-id-display');
+
 
         // --- Countdown Dates (Global Declarations) ---
         // Presale begins on June 16, 2025
@@ -452,6 +491,126 @@
 
         // Presale ends on June 17, 2026
         const presaleEndDate = new Date("2026-06-17T00:00:00Z");
+
+
+        // Initialize Firebase and set up authentication
+        async function initializeFirebase() {
+            if (!firebaseConfig.apiKey) {
+                console.error("Firebase config is missing. Cannot initialize Firestore.");
+                showMessage("Firebase not configured. Data persistence disabled.", 'error');
+                isAuthReady = true; // Still allow app to run without persistence for basic UI
+                updateButtonStates();
+                return;
+            }
+
+            try {
+                const firebaseApp = firebase.initializeApp(firebaseConfig);
+                db = firebase.getFirestore(firebaseApp);
+                auth = firebase.getAuth(firebaseApp);
+
+                firebase.onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        currentUserId = user.uid;
+                        isAuthReady = true;
+                        console.log("Firebase authenticated. User ID:", currentUserId);
+                        userIdDisplayElement.textContent = `User ID: ${currentUserId}`;
+                        // Once authenticated, set up Firestore listeners for presale data and user claims
+                        setupFirestoreListeners();
+                        fetchUserClaimStatus(); // Fetch user-specific claim status
+                    } else {
+                        currentUserId = null;
+                        isAuthReady = true;
+                        console.log("Firebase not authenticated.");
+                        userIdDisplayElement.textContent = 'User ID: Not Available';
+                        // Attempt anonymous sign-in if no user and no custom token
+                        if (!initialAuthToken) {
+                            await firebase.signInAnonymously(auth);
+                        }
+                        updateButtonStates(); // Update button states even if not logged in for initial UI
+                    }
+                });
+
+                // Sign in initially with custom token if available, else anonymously
+                if (initialAuthToken) {
+                    await firebase.signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await firebase.signInAnonymously(auth);
+                }
+
+            } catch (error) {
+                console.error("Error initializing Firebase:", error);
+                showMessage(`Firebase initialization failed: ${error.message}`, 'error');
+                isAuthReady = true;
+                updateButtonStates();
+            }
+        }
+
+        // Set up Firestore listeners for real-time updates
+        function setupFirestoreListeners() {
+            if (!db || !isAuthReady) {
+                console.warn("Firestore or Auth not ready, cannot set up listeners.");
+                return;
+            }
+
+            // Listen to public presale data
+            const presaleDocRef = firebase.doc(db, "artifacts", appId, "public", "data", "presale_data", "current_presale");
+
+            firebase.onSnapshot(presaleDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    const currentRaised = parseFloat(data.raisedAmount || 0);
+                    const currentTarget = parseFloat(data.targetAmount || 5000000);
+
+                    raisedAmountElement.textContent = `$${currentRaised.toLocaleString()}`;
+                    targetAmountElement.textContent = `$${currentTarget.toLocaleString()}`;
+
+                    const progress = (currentRaised / currentTarget) * 100;
+                    presaleProgressElement.style.width = `${Math.min(progress, 100)}%`;
+
+                    console.log("Presale data updated from Firestore:", data);
+                } else {
+                    console.log("No presale data found in Firestore. Initializing with defaults.");
+                    // Initialize with default values if document doesn't exist
+                    firebase.setDoc(presaleDocRef, {
+                        raisedAmount: 20000,
+                        targetAmount: 5000000,
+                        lastUpdated: new Date()
+                    }, { merge: true }).then(() => {
+                        console.log("Default presale data set.");
+                    }).catch(e => {
+                        console.error("Error setting default presale data:", e);
+                        showMessage(`Error initializing presale data: ${e.message}`, 'error');
+                    });
+                }
+                updateButtonStates(); // Update button states after data fetch/init
+            }, (error) => {
+                console.error("Error listening to presale data:", error);
+                showMessage(`Error fetching presale data: ${error.message}`, 'error');
+            });
+        }
+
+        // Fetch user-specific claim status from Firestore
+        async function fetchUserClaimStatus() {
+            if (!db || !currentUserId) {
+                console.warn("Firestore or User ID not ready, cannot fetch claim status.");
+                return;
+            }
+            try {
+                const userClaimDocRef = firebase.doc(db, "artifacts", appId, "users", currentUserId, "presale_claims", "my_claim_status");
+                const docSnap = await firebase.getDoc(userClaimDocRef);
+                if (docSnap.exists() && docSnap.data().claimed) {
+                    presaleClaimed = true;
+                    document.getElementById('presale-claim-status').textContent = "You have already claimed your presale tokens.";
+                } else {
+                    presaleClaimed = false;
+                    document.getElementById('presale-claim-status').textContent = ""; // Clear any previous status
+                }
+                updateButtonStates(); // Update claim button state
+            } catch (error) {
+                console.error("Error fetching user claim status:", error);
+                showMessage(`Error fetching claim status: ${error.message}`, 'error');
+            }
+        }
 
 
         // Initialize TON Connect
@@ -498,15 +657,12 @@
                 });
 
                 // Use connectionRestored for initial connection check.
-                // This promise resolves after TON Connect UI has attempted to restore a session.
                 tonConnectUI.connectionRestored.then((wallet) => {
                     if (wallet) {
                         console.log("Restored existing connection:", wallet);
-                        // The onStatusChange listener will handle the UI update.
                     } else {
                         console.log("No existing connection found to restore.");
-                        // If no connection restored, ensure buttons are disabled via updateButtonStates
-                        updateButtonStates();
+                        updateButtonStates(); // Ensure buttons are disabled if no connection restored
                     }
                 }).catch((error) => {
                     console.error("Error restoring TON Connect UI connection:", error);
@@ -526,7 +682,7 @@
             claimPresaleTokensBtn.disabled = true;
             claimPresaleTokensBtn.textContent = "Connect Wallet to Claim Presale";
             document.getElementById("wallet-status").textContent = "Not Connected";
-            // Do not call updateButtonStates here to avoid recursion, it will be called by onStatusChange or connectionRestored.
+            // updateButtonStates will be called by onStatusChange or connectionRestored.
         }
 
 
@@ -559,7 +715,7 @@
             } else if (!presaleHasEnded) {
                 claimPresaleTokensBtn.disabled = true;
                 claimPresaleTokensBtn.textContent = "Claim Not Active Yet (Presale Ongoing)";
-            } else if (presaleClaimed) { // Check if already claimed
+            } else if (presaleClaimed) { // Check if already claimed from Firestore or local flag
                 claimPresaleTokensBtn.disabled = true;
                 claimPresaleTokensBtn.textContent = "Presale Tokens Claimed!";
             } else {
@@ -570,7 +726,8 @@
 
         // Initialize TON Connect and other initial UI updates when DOM loads
         document.addEventListener('DOMContentLoaded', () => {
-            initTonConnect();
+            initializeFirebase(); // Initialize Firebase first
+            initTonConnect(); // Then initialize TON Connect
             updatePresaleCountdown(); // Initial call to update presale countdown
         });
 
@@ -581,7 +738,7 @@
         const presaleHoursElement = document.getElementById('presale-hours');
         const presaleMinutesElement = document.getElementById('presale-minutes');
         const presaleSecondsElement = document.getElementById('presale-seconds');
-        const presaleCountdownTitle = document.getElementById('presale-countdown-title'); // Get the title element
+        const presaleCountdownTitle = document.getElementById('presale-countdown-title');
 
 
         function updatePresaleCountdown() {
@@ -671,6 +828,11 @@
                 showMessage('The presale has already ended.', 'error');
                 return;
             }
+            if (!db || !currentUserId) {
+                showMessage('Firebase is not ready. Please try again.', 'error');
+                console.error("Firebase not ready for contribution. DB:", db, "User ID:", currentUserId);
+                return;
+            }
 
             const amount = parseFloat(usdtAmountInput.value);
             if (isNaN(amount) || amount < 10 || amount > 1000) {
@@ -699,6 +861,16 @@
 
                 await tonConnectUI.sendTransaction(tx);
                 
+                // Update Firestore after successful simulated transaction
+                const presaleDocRef = firebase.doc(db, "artifacts", appId, "public", "data", "presale_data", "current_presale");
+                await firebase.updateDoc(presaleDocRef, {
+                    raisedAmount: firebase.increment(amount), // Increment raised amount by USDT value
+                    lastContributor: currentUserId,
+                    lastContributionAmount: amount,
+                    lastUpdated: new Date()
+                });
+                console.log("Raised amount updated in Firestore.");
+
                 presaleTransactionStatusDiv.innerHTML = `<div class="transaction-status status-success"><i class="fas fa-check-circle mr-2"></i> Sent ${tonEquivalent.toFixed(2)} TON to SPK presale contract! You received ${amount * presaleTokenRate} SPK.</div>`;
                 showMessage(`Successfully contributed ${amount} USDT!`, 'success');
                 usdtAmountInput.value = '';
@@ -731,6 +903,11 @@
                 showMessage('You have already claimed your presale tokens.', 'warning');
                 return;
             }
+            if (!db || !currentUserId) {
+                showMessage('Firebase is not ready. Cannot record claim.', 'error');
+                console.error("Firebase not ready for claim. DB:", db, "User ID:", currentUserId);
+                return;
+            }
 
             const presaleClaimStatusDiv = document.getElementById('presale-claim-status');
             presaleClaimStatusDiv.textContent = "Processing Presale Token Claim... ";
@@ -747,10 +924,19 @@
                 };
                 await tonConnectUI.sendTransaction(tx);
 
+                // Record user's claim status in Firestore
+                const userClaimDocRef = firebase.doc(db, "artifacts", appId, "users", currentUserId, "presale_claims", "my_claim_status");
+                await firebase.setDoc(userClaimDocRef, {
+                    claimed: true,
+                    timestamp: new Date(),
+                    presaleVersion: "2026-06-17-end" // Helps track claims for specific presale events
+                }, { merge: true });
+                console.log(`User ${currentUserId} claim status updated in Firestore.`);
+
                 presaleClaimStatusDiv.textContent = "✅ Presale tokens claimed successfully!";
                 claimPresaleTokensBtn.textContent = "Tokens Claimed!";
                 showMessage('Presale tokens claimed successfully!', 'success');
-                presaleClaimed = true;
+                presaleClaimed = true; // Update client-side flag
 
             } catch (error) {
                 console.error("Presale token claim failed:", error);
