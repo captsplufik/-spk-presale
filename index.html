@@ -19,7 +19,7 @@
     <script type="module">
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-analytics.js";
+        import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-analytics.js"; // Import logEvent
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
 
@@ -44,6 +44,7 @@
         window.firebase = {
             initializeApp,
             getAnalytics, // Expose getAnalytics as well
+            logEvent, // Expose logEvent
             getAuth,
             signInAnonymously,
             signInWithCustomToken,
@@ -492,6 +493,7 @@
         // Firebase variables (now directly imported and assigned within this script block)
         let db;
         let auth;
+        let analytics; // Declare analytics variable
         let currentUserId = null;
         let isAuthReady = false; // Flag to indicate Firebase auth is ready
 
@@ -530,10 +532,11 @@
             // and exposed globally via window.firebase.
             db = window.firebase.db;
             auth = window.firebase.auth;
+            analytics = window.firebase.analytics; // Assign analytics instance
 
-            if (!db || !auth) {
-                console.error("Firebase services (db, auth) not available from window.firebase.");
-                showMessage("Firebase services failed to initialize. Data persistence disabled.", 'error');
+            if (!db || !auth || !analytics) { // Check for analytics
+                console.error("Firebase services (db, auth, analytics) not available from window.firebase.");
+                showMessage("Firebase services failed to initialize. Data persistence and analytics disabled.", 'error');
                 isAuthReady = true;
                 updateButtonStates();
                 return;
@@ -686,6 +689,9 @@
                         
                         updateButtonStates(); // Re-evaluate button states based on new connection state
                         showMessage('Wallet connected and ready!', 'success');
+                        if (analytics) {
+                            firebase.logEvent(analytics, 'wallet_connected', { wallet_address: wallet.account.address });
+                        }
 
                     } else {
                         walletStatusElement.textContent = 'Not Connected';
@@ -694,6 +700,9 @@
                         
                         disableButtons(); // Disable all buttons if not connected
                         showMessage('Wallet disconnected.', 'warning');
+                        if (analytics) {
+                            firebase.logEvent(analytics, 'wallet_disconnected');
+                        }
                     }
                 });
 
@@ -701,6 +710,9 @@
                 tonConnectUI.connectionRestored.then((wallet) => {
                     if (wallet) {
                         console.log("Restored existing connection:", wallet);
+                        if (analytics) {
+                             firebase.logEvent(analytics, 'wallet_connection_restored', { wallet_address: wallet.account.address });
+                        }
                     } else {
                         console.log("No existing connection found to restore.");
                         updateButtonStates(); // Ensure buttons are disabled if no connection restored
@@ -708,11 +720,17 @@
                 }).catch((error) => {
                     console.error("Error restoring TON Connect UI connection:", error);
                     showMessage("Failed to restore wallet connection. Please try refreshing.", 'error');
+                    if (analytics) {
+                        firebase.logEvent(analytics, 'wallet_connection_restore_failed', { error_message: error.message });
+                    }
                 });
 
             } catch (error) {
                 console.error('TON Connect initialization failed:', error);
                 showMessage('Failed to initialize wallet system. Please check console for details and try again later.', 'error');
+                if (analytics) {
+                    firebase.logEvent(analytics, 'ton_connect_init_failed', { error_message: error.message });
+                }
             }
         }
 
@@ -859,25 +877,40 @@
         contributeBtn.addEventListener('click', async () => {
             if (!tonConnectUI || !tonConnectUI.connected) {
                 showMessage('Please connect your wallet first to contribute.', 'error');
+                if (analytics) {
+                    firebase.logEvent(analytics, 'presale_contribute_failed', { reason: 'wallet_not_connected' });
+                }
                 return;
             }
             if (new Date().getTime() < presaleStartDate.getTime()) {
                 showMessage('Presale has not started yet. Please wait.', 'warning');
+                if (analytics) {
+                    firebase.logEvent(analytics, 'presale_contribute_failed', { reason: 'presale_not_started' });
+                }
                 return;
             }
             if (new Date().getTime() >= presaleEndDate.getTime()) {
                 showMessage('The presale has already ended.', 'error');
+                if (analytics) {
+                    firebase.logEvent(analytics, 'presale_contribute_failed', { reason: 'presale_ended' });
+                }
                 return;
             }
             if (!db || !currentUserId) {
                 showMessage('Firebase is not ready. Please try again.', 'error');
                 console.error("Firebase not ready for contribution. DB:", db, "User ID:", currentUserId);
+                if (analytics) {
+                    firebase.logEvent(analytics, 'presale_contribute_failed', { reason: 'firebase_not_ready' });
+                }
                 return;
             }
 
             const amount = parseFloat(usdtAmountInput.value);
             if (isNaN(amount) || amount < 10 || amount > 1000) {
                 showMessage('Please enter a valid amount between 10-1000 USDT.', 'error');
+                if (analytics) {
+                    firebase.logEvent(analytics, 'presale_contribute_failed', { reason: 'invalid_amount', entered_amount: amount });
+                }
                 return;
             }
 
@@ -886,6 +919,10 @@
             contributeBtnProcessingState.classList.remove('hidden');
             contributeBtn.disabled = true;
             presaleTransactionStatusDiv.innerHTML = '<div class="transaction-status status-warning"><i class="fas fa-hourglass-half mr-2"></i> Processing contribution...</div>';
+
+            if (analytics) {
+                firebase.logEvent(analytics, 'presale_contribute_initiated', { amount_usdt: amount, user_id: currentUserId });
+            }
 
             try {
                 // Convert USDT amount to TON (assuming 1 TON = 2.5 USDT for demonstration, replace with real oracle if available)
@@ -917,10 +954,22 @@
                 usdtAmountInput.value = '';
                 spkTokenRateDisplay.textContent = `${presaleTokenRate} SPK`;
 
+                if (analytics) {
+                    firebase.logEvent(analytics, 'presale_contribute_success', {
+                        amount_usdt: amount,
+                        amount_ton: tonEquivalent.toFixed(2),
+                        tokens_received: amount * presaleTokenRate,
+                        user_id: currentUserId
+                    });
+                }
+
             } catch (error) {
                 console.error("Presale contribution failed:", error);
                 presaleTransactionStatusDiv.innerHTML = `<div class="transaction-status status-error"><i class="fas fa-exclamation-circle mr-2"></i> Transaction cancelled or failed.</div>`;
                 showMessage(`Contribution failed: ${error.message || 'Transaction cancelled or failed.'}`, 'error');
+                if (analytics) {
+                    firebase.logEvent(analytics, 'presale_contribute_failed', { reason: error.message || 'transaction_failed', user_id: currentUserId });
+                }
             } finally {
                 // Ensure button state is reset regardless of success or failure
                 contributeBtnNormalState.classList.remove('hidden');
@@ -934,19 +983,31 @@
         claimPresaleTokensBtn.addEventListener('click', async () => {
             if (!tonConnectUI || !tonConnectUI.connected) {
                 showMessage('Please connect your wallet to claim presale tokens.', 'error');
+                if (analytics) {
+                    firebase.logEvent(analytics, 'presale_claim_failed', { reason: 'wallet_not_connected' });
+                }
                 return;
             }
             if (new Date().getTime() < presaleEndDate.getTime()) {
                 showMessage('Presale claim is not yet active. Please wait until the presale ends.', 'warning');
+                if (analytics) {
+                    firebase.logEvent(analytics, 'presale_claim_failed', { reason: 'claim_not_active' });
+                }
                 return;
             }
             if (presaleClaimed) {
                 showMessage('You have already claimed your presale tokens.', 'warning');
+                if (analytics) {
+                    firebase.logEvent(analytics, 'presale_claim_failed', { reason: 'already_claimed', user_id: currentUserId });
+                }
                 return;
             }
             if (!db || !currentUserId) {
                 showMessage('Firebase is not ready. Cannot record claim.', 'error');
                 console.error("Firebase not ready for claim. DB:", db, "User ID:", currentUserId);
+                if (analytics) {
+                    firebase.logEvent(analytics, 'presale_claim_failed', { reason: 'firebase_not_ready' });
+                }
                 return;
             }
 
@@ -954,6 +1015,10 @@
             presaleClaimStatusDiv.textContent = "Processing Presale Token Claim... ";
             claimPresaleTokensBtn.disabled = true;
             claimPresaleTokensBtn.textContent = "Claiming...";
+
+            if (analytics) {
+                firebase.logEvent(analytics, 'presale_claim_initiated', { user_id: currentUserId });
+            }
 
             try {
                 const tx = {
@@ -979,10 +1044,17 @@
                 showMessage('Presale tokens claimed successfully!', 'success');
                 presaleClaimed = true; // Update client-side flag
 
+                if (analytics) {
+                    firebase.logEvent(analytics, 'presale_claim_success', { user_id: currentUserId });
+                }
+
             } catch (error) {
                 console.error("Presale token claim failed:", error);
                 presaleClaimStatusDiv.innerHTML = `<div class="transaction-status status-error"><i class="fas fa-exclamation-circle mr-2"></i> Claim failed: ${error.message || 'Transaction cancelled or failed.'}</div>`;
                 showMessage(`Presale claim failed: ${error.message || 'Transaction cancelled or failed.'}`, 'error');
+                if (analytics) {
+                    firebase.logEvent(analytics, 'presale_claim_failed', { reason: error.message || 'transaction_failed', user_id: currentUserId });
+                }
             } finally {
                 if (presaleClaimStatusDiv.textContent.includes("claimed successfully!")) {
                     claimPresaleTokensBtn.disabled = true;
