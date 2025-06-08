@@ -480,16 +480,13 @@
                 </button>
                 <div id="presale-transaction-status" class="mt-4"></div>
                 <p class="token-price-display">1 USDT = <span id="spk-token-rate">200 SPK</span></p>
-                <p class="text-gray-400 text-sm mt-2">
-                    Current TON Price: <span id="ton-price-display" class="font-bold text-purple-300">Loading...</span>
-                </p>
-
-                <!-- Presale Claim Button -->
-                <button id="claim-presale-tokens-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-lg shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-75 mt-4" disabled>
-                    Claim Presale Tokens
-                </button>
-                <div id="presale-claim-status" class="mt-4 text-green-400 font-semibold"></div>
             </div>
+
+            <!-- Presale Claim Button -->
+            <button id="claim-presale-tokens-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-lg shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-75 mt-4" disabled>
+                Claim Presale Tokens
+            </button>
+            <div id="presale-claim-status" class="mt-4 text-green-400 font-semibold"></div>
         </section>
     </main>
 
@@ -628,7 +625,7 @@
             }, 5000); // Hide after 5 seconds
         }
 
-        // --- Smart Contract Constants (Placeholders) ---Don
+        // --- Smart Contract Constants (Placeholders) ---
         const PRESALE_CONTRACT_ADDRESS = "EQA0o000000000000000000000000000000000000000000000000000000000000000"; // Example address
         const CONTRACT_ABI = [
             {
@@ -642,12 +639,12 @@
         // --- Multi-Crypto Wallet Addresses (HARDCODED for demonstration) ---
         const WALLET_ADDRESSES = {
             ton: "UQC6_hQoFH_S0zAnK2fFMuAxMIqgIssXjYuqtCJtKBKeN8sI",
-            btc: "1PdRVFj1xt5D6Eh1fdb11PbesxbvsfzEiW",
-            eth: "0x79467Ba14c8B0c1cc8273901E83fF07A108Ce31D", // ERC20 ETH & USDT (ERC20)
-            bnb: "0x79467Ba14c8B0c1cc8273901E83fF07A108Ce31D", // BEP20 BNB & USDT (BEP20)
-            usdt_erc20: "0x79467Ba14c8B0c1cc8273901E83fF07A108Ce31D", // Same as ETH for simplicity, but could be different
-            usdt_trc20: "TMU93szgG1Pu5eA7psbUxjyqqYDPZvx1ch",
-            usdt_bep20: "0x79467Ba14c8B0c1cc8273901E83fF07A108Ce31D" // Same as BNB for simplicity, but could be different
+            btc: "bc1qexamplebtcwalletaddress12345",
+            eth: "0xExampleEthereumAddress123456789", // ERC20 ETH & USDT (ERC20)
+            bnb: "bnb1examplewalletaddressforbnbtoken", // BEP20 BNB & USDT (BEP20)
+            usdt_erc20: "0xExampleEthereumAddress123456789", // Same as ETH for simplicity, but could be different
+            usdt_trc20: "TExampleTRC20USDTAddress45678",
+            usdt_bep20: "bnb1examplewalletaddressforbnbtoken" // Same as BNB for simplicity, but could be different
         };
 
 
@@ -660,7 +657,7 @@
 
         let tonConnectUI;
         let presaleClaimed = false; // Client-side flag for claim status
-        let currentTonPrice = 0; // Variable to store the fetched TON price
+        // Removed: let currentTonPrice = 0; // Variable to store the fetched TON price
 
         // Firebase variables (assigned in DOMContentLoaded)
         let db;
@@ -689,7 +686,7 @@
         const targetAmountElement = document.getElementById('targetAmount');
         const presaleProgressElement = document.getElementById('presaleProgress');
         const userIdDisplayElement = document.getElementById('user-id-display');
-        const tonPriceDisplayElement = document.getElementById('ton-price-display');
+        // Removed: const tonPriceDisplayElement = document.getElementById('ton-price-display');
 
         // Admin Panel Elements
         const adminPanelSection = document.getElementById('admin-panel');
@@ -727,40 +724,10 @@
         const presaleEndDate = new Date("2026-06-17T00:00:00Z");
 
 
-        // --- Fetch TON Price from CoinGecko ---
-        async function fetchTonPrice() {
-            try {
-                const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=the-open-network&vs_currencies=usd');
-                const data = await response.json();
-                if (data && data['the-open-network'] && data['the-open-network'].usd) {
-                    currentTonPrice = data['the-open-network'].usd;
-                    tonPriceDisplayElement.textContent = `$${currentTonPrice.toFixed(4)} USDT`;
-                    showMessage(`Current TON price fetched: $${currentTonPrice.toFixed(4)}`, 'success');
-                    if (analytics) {
-                        window.firebase.logEvent(analytics, 'ton_price_fetched', { price: currentTonPrice });
-                    }
-                } else {
-                    console.error("Failed to fetch TON price: Data structure incorrect.", data);
-                    tonPriceDisplayElement.textContent = `N/A`;
-                    showMessage("Failed to fetch TON price. Using default.", 'warning');
-                    // Fallback to a default if API fails
-                    currentTonPrice = 2.5; // Example fallback price
-                }
-            } catch (error) {
-                console.error("Error fetching TON price:", error);
-                tonPriceDisplayElement.textContent = `N/A`;
-                showMessage("Error fetching TON price. Using default.", 'error');
-                if (analytics) {
-                    window.firebase.logEvent(analytics, 'ton_price_fetch_failed', { error_message: error.message });
-                }
-                // Fallback to a default if API call fails
-                currentTonPrice = 2.5; // Example fallback price
-            }
-            // Update the SPK token rate display based on the fetched or default TON price
-            updateSpkTokenRateDisplay();
-        }
+        // --- Removed: Fetch TON Price from CoinGecko ---
+        // The fetchTonPrice function and its associated calls are removed as requested.
 
-        // Update SPK Token Rate Display based on currentTonPrice or current USDT amount
+        // Update SPK Token Rate Display based on current USDT amount
         function updateSpkTokenRateDisplay() {
             const selectedMethod = paymentMethodSelect.value;
             let usdtValue = 0;
@@ -1054,7 +1021,7 @@
         // A helper function to disable buttons and reset related UI elements when wallet is disconnected
         function disableButtons() {
             contributeBtn.disabled = true;
-            contributeBtn.textContent = "Connect Wallet to Buy";
+            contributeBtn.textContent = "Connect Wallet to Buy"; // Changed to generic
             claimPresaleTokensBtn.disabled = true;
             claimPresaleTokensBtn.textContent = "Connect Wallet to Claim Presale";
             document.getElementById("wallet-status").textContent = "Not Connected";
@@ -1080,7 +1047,7 @@
 
                 if (!isWalletConnected) {
                     contributeBtn.disabled = true;
-                    contributeBtnNormalState.textContent = "Connect TON Wallet to Buy";
+                    contributeBtnNormalState.textContent = "Connect Wallet to Buy"; // Changed to generic
                 } else if (!presaleHasStarted) {
                     contributeBtn.disabled = true;
                     contributeBtnNormalState.textContent = "Presale Not Started Yet";
@@ -1140,8 +1107,8 @@
             initializeFirebase();
             initTonConnect();
             updatePresaleCountdown();
-            fetchTonPrice();
-            setInterval(fetchTonPrice, 300000); // Fetch price every 5 minutes (300000 ms)
+            // Removed: fetchTonPrice();
+            // Removed: setInterval(fetchTonPrice, 300000); // Fetch price every 5 minutes (300000 ms)
 
             // Initial setup for payment method display
             handlePaymentMethodChange();
@@ -1246,7 +1213,7 @@
             if (selectedMethod === 'ton') {
                 amountUsdt = parseFloat(usdtAmountInput.value);
                 if (!tonConnectUI || !tonConnectUI.connected) {
-                    showMessage('Please connect your TON wallet to contribute.', 'error');
+                    showMessage('Please connect your wallet to contribute.', 'error'); // Changed to generic
                     if (analytics) {
                         window.firebase.logEvent(analytics, 'presale_contribute_failed', { reason: 'wallet_not_connected', method: selectedMethod });
                     }
@@ -1302,13 +1269,7 @@
                 }
                 return;
             }
-            if (currentTonPrice <= 0 && selectedMethod === 'ton') { // Only check TON price if TON is selected
-                showMessage('TON price not loaded. Please wait a moment or refresh.', 'warning');
-                if (analytics) {
-                    window.firebase.logEvent(analytics, 'presale_contribute_failed', { reason: 'ton_price_unavailable', method: selectedMethod });
-                }
-                return;
-            }
+            // Removed: If statement checking currentTonPrice
 
             // Set button to processing state
             contributeBtnNormalState.classList.add('hidden');
@@ -1323,7 +1284,8 @@
             try {
                 if (selectedMethod === 'ton') {
                     // TON-specific transaction logic
-                    const tonEquivalent = amountUsdt / currentTonPrice;
+                    // Fixed TON conversion rate for demonstration, as live API removed
+                    const tonEquivalent = amountUsdt / 2.5; // Assuming 1 TON = 2.5 USDT for demonstration
                     const tonNano = (tonEquivalent * 1e9).toFixed(0);
 
                     const tx = {
