@@ -17,13 +17,33 @@
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <!-- Firebase SDKs -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-analytics.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
 
-        // Global Firebase variables, initialized in a separate script block
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBQLJ8yVgrnchDkfpj8NF_aPiSDPDo2a_Q",
+            authDomain: "splufik-spk.firebaseapp.com",
+            projectId: "splufik-spk",
+            storageBucket: "splufik-spk.firebasestorage.app",
+            messagingSenderId: "67191790905",
+            appId: "1:67191790905:web:56ed3a7946e392cbe45ce8",
+            measurementId: "G-QGWXYKS7DS"
+        };
+
+        // Initialize Firebase app directly
+        const firebaseApp = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(firebaseApp); // Initialize Analytics
+        const db = getFirestore(firebaseApp);
+        const auth = getAuth(firebaseApp);
+
+        // Expose Firebase objects and functions globally for the main script block
         window.firebase = {
             initializeApp,
+            getAnalytics, // Expose getAnalytics as well
             getAuth,
             signInAnonymously,
             signInWithCustomToken,
@@ -34,7 +54,10 @@
             setDoc,
             updateDoc,
             onSnapshot,
-            increment
+            increment,
+            db, // Expose db instance
+            auth, // Expose auth instance
+            analytics // Expose analytics instance
         };
     </script>
 
@@ -466,26 +489,24 @@
         let tonConnectUI;
         let presaleClaimed = false; // Client-side flag for claim status
 
-        // Firebase variables
+        // Firebase variables (now directly imported and assigned within this script block)
         let db;
         let auth;
         let currentUserId = null;
         let isAuthReady = false; // Flag to indicate Firebase auth is ready
 
-        // Global variables from Canvas environment (provided by the runtime)
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        // Firebase configuration (now hardcoded as per your provided details)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBQLJ8yVgrnchDkfpj8NF_aPiSDPDo2a_Q",
+            authDomain: "splufik-spk.firebaseapp.com",
+            projectId: "splufik-spk",
+            storageBucket: "splufik-spk.firebasestorage.app",
+            messagingSenderId: "67191790905",
+            appId: "1:67191790905:web:56ed3a7946e392cbe45ce8",
+            measurementId: "G-QGWXYKS7DS"
+        };
         
-const firebaseConfig = {
-  apiKey: "AIzaSyBQLJ8yVgrnchDkfpj8NF_aPiSDPDo2a_Q",
-  authDomain: "splufik-spk.firebaseapp.com",
-  projectId: "splufik-spk",
-  storageBucket: "splufik-spk.firebasestorage.app",
-  messagingSenderId: "67191790905",
-  appId: "1:67191790905:web:56ed3a7946e392cbe45ce8",
-  measurementId: "G-QGWXYKS7DS"
-};
-
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        const appId = firebaseConfig.projectId; // Use the projectId from the provided config
 
         const contributeBtn = document.getElementById("contribute-btn");
         const claimPresaleTokensBtn = document.getElementById("claim-presale-tokens-btn");
@@ -505,60 +526,69 @@ const firebaseConfig = {
 
         // Initialize Firebase and set up authentication
         async function initializeFirebase() {
-            if (!firebaseConfig.apiKey) {
-                console.error("Firebase config is missing. Cannot initialize Firestore.");
-                showMessage("Firebase not configured. Data persistence disabled.", 'error');
-                isAuthReady = true; // Still allow app to run without persistence for basic UI
+            // The Firebase app and services are already initialized in the <script type="module"> block
+            // and exposed globally via window.firebase.
+            db = window.firebase.db;
+            auth = window.firebase.auth;
+
+            if (!db || !auth) {
+                console.error("Firebase services (db, auth) not available from window.firebase.");
+                showMessage("Firebase services failed to initialize. Data persistence disabled.", 'error');
+                isAuthReady = true;
                 updateButtonStates();
                 return;
             }
 
             try {
-                const firebaseApp = firebase.initializeApp(firebaseConfig);
-                db = firebase.getFirestore(firebaseApp);
-                auth = firebase.getAuth(firebaseApp);
-
-                firebase.onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        currentUserId = user.uid;
-                        isAuthReady = true;
-                        console.log("Firebase authenticated. User ID:", currentUserId);
-                        userIdDisplayElement.textContent = `User ID: ${currentUserId}`;
-                        // Once authenticated, set up Firestore listeners for presale data and user claims
-                        setupFirestoreListeners();
-                        fetchUserClaimStatus(); // Fetch user-specific claim status
-                    } else {
-                        currentUserId = null;
-                        isAuthReady = true;
-                        console.log("Firebase not authenticated.");
-                        userIdDisplayElement.textContent = 'User ID: Not Available';
-                        // Attempt anonymous sign-in if no user and no custom token
-                        if (!initialAuthToken) {
-                            await firebase.signInAnonymously(auth);
-                        }
-                        updateButtonStates(); // Update button states even if not logged in for initial UI
-                    }
-                });
-
-                // Sign in initially with custom token if available, else anonymously
-                if (initialAuthToken) {
-                    await firebase.signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await firebase.signInAnonymously(auth);
-                }
+                setupAuthStateListener();
 
             } catch (error) {
-                console.error("Error initializing Firebase:", error);
+                console.error("Error initializing Firebase (within initializeFirebase func):", error);
                 showMessage(`Firebase initialization failed: ${error.message}`, 'error');
                 isAuthReady = true;
                 updateButtonStates();
             }
         }
 
+        // Function to set up Firebase Auth state listener
+        function setupAuthStateListener() {
+            // Check if auth is defined before setting up listener
+            if (!auth) {
+                console.error("Auth object is undefined, cannot set up auth state listener.");
+                return;
+            }
+            firebase.onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    currentUserId = user.uid;
+                    isAuthReady = true;
+                    console.log("Firebase authenticated. User ID:", currentUserId);
+                    userIdDisplayElement.textContent = `User ID: ${currentUserId}`;
+                    // Once authenticated, set up Firestore listeners for presale data and user claims
+                    setupFirestoreListeners();
+                    fetchUserClaimStatus(); // Fetch user-specific claim status
+                } else {
+                    currentUserId = null;
+                    isAuthReady = true;
+                    console.log("Firebase not authenticated. Attempting anonymous sign-in.");
+                    userIdDisplayElement.textContent = 'User ID: Not Available';
+                    try {
+                        // await signInAnonymously(auth); // Commented out until auth is enabled
+                    } catch (anonError) {
+                        console.error("Error during anonymous sign-in attempt:", anonError);
+                        showMessage(`Anonymous sign-in failed: ${anonError.message}. Data persistence may be limited.`, 'error');
+                    }
+                    updateButtonStates(); // Update button states even if not logged in for initial UI
+                }
+            });
+            // No need for initial anonymous sign-in outside onAuthStateChanged
+            // as onAuthStateChanged handles initial state and sign-in if needed.
+        }
+
+
         // Set up Firestore listeners for real-time updates
         function setupFirestoreListeners() {
-            if (!db || !isAuthReady) {
-                console.warn("Firestore or Auth not ready, cannot set up listeners.");
+            if (!db || !isAuthReady || !currentUserId) { // Ensure currentUserId is available before listening to user-specific data
+                console.warn("Firestore, Auth, or User ID not ready, cannot set up listeners.");
                 return;
             }
 
@@ -606,6 +636,7 @@ const firebaseConfig = {
                 return;
             }
             try {
+                // Ensure data is stored under the user's specific path
                 const userClaimDocRef = firebase.doc(db, "artifacts", appId, "users", currentUserId, "presale_claims", "my_claim_status");
                 const docSnap = await firebase.getDoc(userClaimDocRef);
                 if (docSnap.exists() && docSnap.data().claimed) {
