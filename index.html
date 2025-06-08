@@ -572,7 +572,7 @@
                     console.log("Firebase not authenticated. Attempting anonymous sign-in.");
                     userIdDisplayElement.textContent = 'User ID: Not Available';
                     try {
-                        // await signInAnonymously(auth); // Commented out until auth is enabled
+                        await firebase.signInAnonymously(auth); // Re-enabled anonymous sign-in
                     } catch (anonError) {
                         console.error("Error during anonymous sign-in attempt:", anonError);
                         showMessage(`Anonymous sign-in failed: ${anonError.message}. Data persistence may be limited.`, 'error');
