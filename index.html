@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,18 +21,33 @@
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
         import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-analytics.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
 
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBQLJ8yVgrnchDkfpj8NF_aPiSDPDo2a_Q",
+            authDomain: "splufik-spk.firebaseapp.com",
+            projectId: "splufik-spk",
+            storageBucket: "splufik-spk.firebasestorage.app",
+            messagingSenderId: "67191790905",
+            appId: "1:67191790905:web:56ed3a7946e392cbe45ce8",
+            measurementId: "G-QGWXYKS7DS"
+        };
+
+        // Initialize Firebase app directly
+        const firebaseApp = initializeApp(firebaseConfig);
+        const analyticsInstance = getAnalytics(firebaseApp); // Renamed to avoid conflict with global var
+        const dbInstance = getFirestore(firebaseApp); // Renamed
+        const authInstance = getAuth(firebaseApp); // Renamed
+
         // Expose Firebase objects and functions globally for the main script block
-        // These will be assigned in initializeFirebase after parsing __firebase_config
         window.firebase = {
             initializeApp,
             getAnalytics,
             logEvent,
             getAuth,
             signInAnonymously,
-            signInWithCustomToken, // Ensure signInWithCustomToken is exposed
             signInWithPopup,
             GoogleAuthProvider,
             signOut,
@@ -42,7 +58,10 @@
             setDoc,
             updateDoc,
             onSnapshot,
-            increment
+            increment,
+            db: dbInstance, // Expose db instance
+            auth: authInstance, // Expose auth instance
+            analytics: analyticsInstance // Expose analytics instance
         };
     </script>
 
@@ -632,29 +651,35 @@
 
         // --- TON Connect Configuration ---
         const tonConnectConfig = {
-            // Re-added manifestUrl and walletsListUrl as per user's latest input.
-            // Ensure these files are hosted and publicly accessible for production.
-            manifestUrl: "/tonconnect-manifest.json",
-            walletsListUrl: "/wallets-v2.json",
+            manifestUrl: "https://spk-presale-git-main-captsplufiks-projects.vercel.app/tonconnect-manifest.json",
             buttonRootId: "ton-connect",
             chain: 'mainnet',
         };
 
         let tonConnectUI;
         let presaleClaimed = false; // Client-side flag for claim status
+        // Removed: let currentTonPrice = 0; // Variable to store the fetched TON price
 
-        // Firebase variables (assigned after successful Firebase initialization)
+        // Firebase variables (assigned in DOMContentLoaded)
         let db;
         let auth;
         let analytics;
         let currentUserId = null;
         let isAuthReady = false; // Flag to indicate Firebase auth is ready
-        let isAdmin = false; // Flag to track admin status
+        let isAdmin = false; // New: Flag to track admin status
 
-        // Global variables provided by the environment
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfigFromGlobal = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // Firebase configuration (now hardcoded as per your provided details)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBQLJ8yVgrnchDkfpj8NF_aPiSDPDo2a_Q",
+            authDomain: "splufik-spk.firebaseapp.com",
+            projectId: "splufik-spk",
+            storageBucket: "splufik-spk.firebasestorage.app",
+            messagingSenderId: "67191790905",
+            appId: "1:67191790905:web:56ed3a7946e392cbe45ce8",
+            measurementId: "G-QGWXYKS7DS"
+        };
+        
+        const appId = firebaseConfig.projectId; // Use the projectId from the provided config
 
         const contributeBtn = document.getElementById("contribute-btn");
         const claimPresaleTokensBtn = document.getElementById("claim-presale-tokens-btn");
@@ -662,6 +687,7 @@
         const targetAmountElement = document.getElementById('targetAmount');
         const presaleProgressElement = document.getElementById('presaleProgress');
         const userIdDisplayElement = document.getElementById('user-id-display');
+        // Removed: const tonPriceDisplayElement = document.getElementById('ton-price-display');
 
         // Admin Panel Elements
         const adminPanelSection = document.getElementById('admin-panel');
@@ -699,6 +725,9 @@
         const presaleEndDate = new Date("2026-06-17T00:00:00Z");
 
 
+        // --- Removed: Fetch TON Price from CoinGecko ---
+        // The fetchTonPrice function and its associated calls are removed as requested.
+
         // Update SPK Token Rate Display based on current USDT amount
         function updateSpkTokenRateDisplay() {
             const selectedMethod = paymentMethodSelect.value;
@@ -717,34 +746,26 @@
 
         // Initialize Firebase and set up authentication
         async function initializeFirebase() {
+            // Check if window.firebase and its properties are available
+            if (!window.firebase || !window.firebase.db || !window.firebase.auth || !window.firebase.analytics) {
+                console.error("Firebase global objects (db, auth, analytics) not available.");
+                showMessage("Firebase services failed to initialize. Data persistence and analytics disabled.", 'error');
+                isAuthReady = true;
+                updateButtonStates();
+                return;
+            }
+            
+            // Assign global variables from window.firebase
+            db = window.firebase.db;
+            auth = window.firebase.auth;
+            analytics = window.firebase.analytics;
+
             try {
-                if (!firebaseConfigFromGlobal) {
-                    console.error("Firebase config not available from global variables.");
-                    showMessage("Firebase configuration missing. Data persistence and analytics disabled.", 'error');
-                    isAuthReady = true;
-                    updateButtonStates();
-                    return;
-                }
-
-                // Initialize Firebase app
-                const firebaseApp = window.firebase.initializeApp(firebaseConfigFromGlobal);
-                db = window.firebase.getFirestore(firebaseApp);
-                auth = window.firebase.getAuth(firebaseApp);
-                analytics = window.firebase.getAnalytics(firebaseApp);
-
-                // Sign in with custom token or anonymously
-                if (initialAuthToken) {
-                    await window.firebase.signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await window.firebase.signInAnonymously(auth);
-                }
-
                 setupAuthStateListener();
-
             } catch (error) {
-                console.error("Error initializing Firebase:", error);
-                showMessage(`Firebase initialization failed: ${error.message}. Data persistence and analytics disabled.`, 'error');
-                isAuthReady = true; // Mark as ready even on error to allow UI interaction
+                console.error("Error initializing Firebase (within initializeFirebase func):", error);
+                showMessage(`Firebase initialization failed: ${error.message}`, 'error');
+                isAuthReady = true;
                 updateButtonStates();
             }
         }
@@ -755,14 +776,15 @@
                 console.error("Auth object is undefined, cannot set up auth state listener.");
                 return;
             }
-            window.firebase.onAuthStateChanged(auth, async (user) => {
+            window.firebase.onAuthStateChanged(auth, async (user) => { // Use window.firebase.onAuthStateChanged
                 if (user) {
                     currentUserId = user.uid;
                     isAuthReady = true;
                     console.log("Firebase authenticated. User ID:", currentUserId);
-                    userIdDisplayElement.textContent = `User ID: ${currentUserId}`; // Display full user ID
+                    userIdDisplayElement.textContent = `User ID: ${currentUserId}`;
                     
                     // Check if the current user is an admin (e.g., based on a specific UID or a Firestore role)
+                    // For demonstration, let's assume a hardcoded admin UID. In production, use proper roles.
                     const ADMIN_UIDS = ["YOUR_ADMIN_UID_1", "YOUR_ADMIN_UID_2"]; // Replace with actual admin UIDs
                     isAdmin = ADMIN_UIDS.includes(currentUserId);
                     
@@ -785,18 +807,23 @@
                     fetchUserClaimStatus();
 
                 } else {
-                    // This block handles the case where the user is not authenticated (e.g., after logout)
-                    // or if initial anonymous sign-in fails.
-                    currentUserId = crypto.randomUUID(); // Assign a random ID for unauthenticated users
+                    currentUserId = null;
                     isAuthReady = true;
                     isAdmin = false;
-                    console.log("Firebase not authenticated. Using anonymous ID:", currentUserId);
-                    userIdDisplayElement.textContent = `User ID: ${currentUserId}`; // Display random ID
+                    console.log("Firebase not authenticated. Attempting anonymous sign-in.");
+                    userIdDisplayElement.textContent = 'User ID: Not Available';
                     adminStatusElement.textContent = "Status: Not Logged In";
                     adminUserIdElement.textContent = '';
                     adminLoginBtn.classList.remove('hidden');
                     adminLogoutBtn.classList.add('hidden');
                     adminPanelSection.classList.remove('active');
+
+                    try {
+                        await window.firebase.signInAnonymously(auth); // Use window.firebase.signInAnonymously
+                    } catch (anonError) {
+                        console.error("Error during anonymous sign-in attempt:", anonError);
+                        showMessage(`Anonymous sign-in failed: ${anonError.message}. Data persistence may be limited.`, 'error');
+                    }
                     updateButtonStates();
                 }
             });
@@ -804,13 +831,9 @@
 
         // Handle Admin Google Login
         adminLoginBtn.addEventListener('click', async () => {
-            if (!auth) {
-                showMessage('Firebase Auth not initialized.', 'error');
-                return;
-            }
-            const provider = new window.firebase.GoogleAuthProvider();
+            const provider = new window.firebase.GoogleAuthProvider(); // Use window.firebase.GoogleAuthProvider
             try {
-                await window.firebase.signInWithPopup(auth, provider);
+                await window.firebase.signInWithPopup(auth, provider); // Use window.firebase.signInWithPopup
                 showMessage('Successfully logged in as admin!', 'success');
                 if (analytics) {
                     window.firebase.logEvent(analytics, 'admin_login_success');
@@ -826,12 +849,8 @@
 
         // Handle Admin Logout
         adminLogoutBtn.addEventListener('click', async () => {
-            if (!auth) {
-                showMessage('Firebase Auth not initialized.', 'error');
-                return;
-            }
             try {
-                await window.firebase.signOut(auth);
+                await window.firebase.signOut(auth); // Use window.firebase.signOut
                 showMessage('Successfully logged out.', 'success');
                 if (analytics) {
                     window.firebase.logEvent(analytics, 'admin_logout');
@@ -851,9 +870,9 @@
             }
 
             // Listen to public presale data
-            const presaleDocRef = window.firebase.doc(db, "artifacts", appId, "public", "data", "presale_data", "current_presale");
+            const presaleDocRef = window.firebase.doc(db, "artifacts", appId, "public", "data", "presale_data", "current_presale"); // Use window.firebase.doc
 
-            window.firebase.onSnapshot(presaleDocRef, (docSnap) => {
+            window.firebase.onSnapshot(presaleDocRef, (docSnap) => { // Use window.firebase.onSnapshot
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     const currentRaised = parseFloat(data.raisedAmount || 0);
@@ -867,17 +886,17 @@
                         adminTargetAmountElement.textContent = `$${currentTarget.toLocaleString()}`;
                     }
 
+
                     const progress = (currentRaised / currentTarget) * 100;
                     presaleProgressElement.style.width = `${Math.min(progress, 100)}%`;
 
                     console.log("Presale data updated from Firestore:", data);
                 } else {
                     console.log("No presale data found in Firestore. Initializing with defaults.");
-                    // Initialize with default values if document does not exist
-                    window.firebase.setDoc(presaleDocRef, {
+                    window.firebase.setDoc(presaleDocRef, { // Use window.firebase.setDoc
                         raisedAmount: 20000,
                         targetAmount: 5000000,
-                        lastUpdated: new Date().toISOString() // Store as ISO string
+                        lastUpdated: new Date()
                     }, { merge: true }).then(() => {
                         console.log("Default presale data set.");
                     }).catch(e => {
@@ -899,8 +918,8 @@
                 return;
             }
             try {
-                const userClaimDocRef = window.firebase.doc(db, "artifacts", appId, "users", currentUserId, "presale_claims", "my_claim_status");
-                const docSnap = await window.firebase.getDoc(userClaimDocRef);
+                const userClaimDocRef = window.firebase.doc(db, "artifacts", appId, "users", currentUserId, "presale_claims", "my_claim_status"); // Use window.firebase.doc
+                const docSnap = await window.firebase.getDoc(userClaimDocRef); // Use window.firebase.getDoc
                 if (docSnap.exists() && docSnap.data().claimed) {
                     presaleClaimed = true;
                     document.getElementById('presale-claim-status').textContent = "You have already claimed your presale tokens.";
@@ -920,10 +939,7 @@
         async function initTonConnect() {
             try {
                 tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-                    // Re-added manifestUrl and walletsListUrl as per user's latest input.
-                    // Ensure these files are hosted and publicly accessible for production.
                     manifestUrl: tonConnectConfig.manifestUrl,
-                    walletsListUrl: tonConnectConfig.walletsListUrl,
                     buttonRootId: tonConnectConfig.buttonRootId,
                     language: 'en',
                     uiPreferences: {
@@ -973,9 +989,8 @@
                     }
                 });
 
-                if (analytics) {
-                    window.firebase.logEvent(analytics, 'ton_connect_init_attempt');
-                }
+                // Use window.firebase.logEvent here
+                window.firebase.logEvent(analytics, 'ton_connect_init_attempt');
 
                 tonConnectUI.connectionRestored.then((wallet) => {
                     if (wallet) {
@@ -1007,7 +1022,7 @@
         // A helper function to disable buttons and reset related UI elements when wallet is disconnected
         function disableButtons() {
             contributeBtn.disabled = true;
-            contributeBtnNormalState.textContent = "Connect Wallet to Buy"; // Changed to generic
+            contributeBtn.textContent = "Connect Wallet to Buy"; // Changed to generic
             claimPresaleTokensBtn.disabled = true;
             claimPresaleTokensBtn.textContent = "Connect Wallet to Claim Presale";
             document.getElementById("wallet-status").textContent = "Not Connected";
@@ -1064,7 +1079,7 @@
                 }
                 else {
                     contributeBtn.disabled = false;
-                    contributeBtnNormalState.textContent = `Confirm Payment (via ${selectedMethod.toUpperCase().replace('_', ' ')}`;
+                    contributeBtnNormalState.textContent = `Confirm Payment (via ${selectedMethod.toUpperCase().replace('_', ' ')})`;
                 }
             }
 
@@ -1085,9 +1100,16 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Assign global variables from window.firebase here
+            db = window.firebase.db;
+            auth = window.firebase.auth;
+            analytics = window.firebase.analytics;
+
             initializeFirebase();
             initTonConnect();
             updatePresaleCountdown();
+            // Removed: fetchTonPrice();
+            // Removed: setInterval(fetchTonPrice, 300000); // Fetch price every 5 minutes (300000 ms)
 
             // Initial setup for payment method display
             handlePaymentMethodChange();
@@ -1192,7 +1214,7 @@
             if (selectedMethod === 'ton') {
                 amountUsdt = parseFloat(usdtAmountInput.value);
                 if (!tonConnectUI || !tonConnectUI.connected) {
-                    showMessage('Please connect your wallet to contribute.', 'error');
+                    showMessage('Please connect your wallet to contribute.', 'error'); // Changed to generic
                     if (analytics) {
                         window.firebase.logEvent(analytics, 'presale_contribute_failed', { reason: 'wallet_not_connected', method: selectedMethod });
                     }
@@ -1248,6 +1270,7 @@
                 }
                 return;
             }
+            // Removed: If statement checking currentTonPrice
 
             // Set button to processing state
             contributeBtnNormalState.classList.add('hidden');
@@ -1297,7 +1320,7 @@
                     lastContributor: currentUserId,
                     lastContributionAmount: amountUsdt,
                     lastContributionMethod: selectedMethod,
-                    lastUpdated: new Date().toISOString() // Store as ISO string
+                    lastUpdated: new Date()
                 });
                 console.log("Raised amount updated in Firestore.");
 
@@ -1379,10 +1402,10 @@
                 await tonConnectUI.sendTransaction(tx);
 
                 // Record user's claim status in Firestore
-                const userClaimDocRef = window.firebase.doc(db, "artifacts", appId, "users", currentUserId, "presale_claims", "my_claim_status");
-                await window.firebase.setDoc(userClaimDocRef, {
+                const userClaimDocRef = window.firebase.doc(db, "artifacts", appId, "users", currentUserId, "presale_claims", "my_claim_status"); // Use window.firebase.doc
+                await window.firebase.setDoc(userClaimDocRef, { // Use window.firebase.setDoc
                     claimed: true,
-                    timestamp: new Date().toISOString(), // Store as ISO string
+                    timestamp: new Date(),
                     presaleVersion: "2026-06-17-end" // Helps track claims for specific presale events
                 }, { merge: true });
                 console.log(`User ${currentUserId} claim status updated in Firestore.`);
