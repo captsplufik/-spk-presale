@@ -383,6 +383,7 @@
             </a>
             <ul class="hidden md:flex space-x-8 text-lg">
                 <li><a href="#presale-section" class="hover:text-purple-400 transition-colors duration-300">Presale</a></li>
+                <li><a href="#airdrop-section" class="hover:text-purple-400 transition-colors duration-300">Airdrop</a></li>
                 <li><a href="#tokenomics" class="hover:text-purple-400 transition-colors duration-300">Tokenomics</a></li>
                 <li><a href="#roadmap" class="hover:text-purple-400 transition-colors duration-300">Roadmap</a></li>
                 <li><a href="https://docs.yourproject.com" target="_blank" rel="noopener noreferrer" class="hover:text-purple-400 transition-colors duration-300">Docs</a></li>
@@ -516,6 +517,54 @@
                 </div>
             </div>
         </section>
+
+        <!-- Airdrop Section -->
+        <section id="airdrop-section" class="max-w-3xl mx-auto bg-gray-800 bg-opacity-80 backdrop-blur-md p-8 md:p-12 rounded-3xl shadow-2xl border border-gray-700 text-center animate-fade-in-up hidden">
+            <h2 class="text-4xl md:text-5xl font-bold mb-12 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-green-600">
+                SPK Airdrop!
+            </h2>
+            <p class="text-lg text-gray-300 mb-6">
+                Want to claim your share of SPK tokens for FREE? Complete all steps below to be eligible:
+            </p>
+
+            <ul class="text-left space-y-3 mb-8 text-lg">
+                <li id="airdrop-step-1" class="flex items-center">
+                    <span class="text-gray-500 mr-3"><i class="fas fa-square"></i></span>
+                    <span>
+                        <span class="font-bold">1. Purchase at least <span class="text-yellow-300">2,000 SPK</span></span>
+                        <br><small class="text-gray-400">Contribute to the presale with TON or other crypto. (Equivalent to <span id="min-purchase-usdt">25 USDT</span>)</small>
+                    </span>
+                </li>
+                <li id="airdrop-step-2" class="flex items-center">
+                    <span class="text-gray-500 mr-3"><i class="fas fa-square"></i></span>
+                    <span>
+                        <span class="font-bold">2. Refer at least <span class="text-yellow-300">3 friends</span></span>
+                        <br><small class="text-gray-400">Each referral must join via your link & contribute at least <span id="min-referral-ton">1 TON</span> (approx <span id="min-referral-usdt">2.5 USDT</span>) to the presale.</small>
+                    </span>
+                </li>
+                <li id="airdrop-step-3" class="flex items-center">
+                    <span class="text-gray-500 mr-3"><i class="fas fa-square"></i></span>
+                    <span>
+                        <span class="font-bold">3. Follow & engage on all social platforms</span>
+                        <br><small class="text-gray-400">Join our <a href="https://t.me/+pfQZh-Qznfk4Yzdh" target="_blank" class="text-blue-400 hover:underline">Telegram</a>, follow us on <a href="https://x.com/splufictoken" target="_blank" class="text-blue-400 hover:underline">X (Twitter)</a>, like, comment & share the launch post.</small>
+                    </span>
+                </li>
+            </ul>
+
+            <p class="text-md text-gray-300 mb-6 font-semibold">
+                � Airdrop Distribution: Airdrops will be claimable after presale ends (June 16, 2026). Verified wallets will be eligible to claim directly from the site.
+            </p>
+
+            <div id="airdrop-status-message" class="mb-6 text-xl text-gray-400">
+                Connect your wallet to check eligibility.
+            </div>
+            <button id="claim-airdrop-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-12 rounded-full text-xl shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-75 mt-6" disabled>
+                <span id="airdrop-btn-normal-state"><i class="fas fa-gift mr-2"></i> Claim Your Airdrop</span>
+                <span id="airdrop-btn-processing-state" class="hidden">Claiming... <i class="fas fa-spinner fa-spin ml-2"></i></span>
+            </button>
+        </section>
+
+
     </main>
 
     <!-- Admin Panel Section -->
@@ -685,6 +734,7 @@
 
         let tonConnectUI;
         let presaleClaimed = false; // Client-side flag for claim status
+        let airdropClaimed = false; // New: Client-side flag for airdrop status
 
         // Firebase variables (assigned in DOMContentLoaded)
         let db;
@@ -741,7 +791,13 @@
 
         const presaleTokenRate = 200; // SPK per 1 USDT
         const referralRewardSPK = 500; // SPK rewarded per successful referral
+        const airdropAmount = 25000; // New: SPK for airdrop (updated to 25,000)
 
+        // Airdrop Eligibility Criteria Constants
+        const airdropMinPurchaseSPK = 2000; // Changed from 5000 to 2000
+        const airdropMinReferrals = 3;
+        const airdropMinReferralContributionUSDT = 2.5; // Assuming 1 TON = 2.5 USDT for the referral condition
+        const tonToUsdtRate = 2.5; // Placeholder rate for display
 
         // --- Countdown Dates (Global Declarations) ---
         // Presale begins on June 16, 2025
@@ -756,6 +812,19 @@
         const copyReferralLinkBtn = document.getElementById('copyReferralLinkBtn');
         const totalReferralSpkElement = document.getElementById('total-referral-spk');
         const totalReferralsCountElement = document.getElementById('total-referrals-count');
+
+        // --- Airdrop Elements ---
+        const airdropSection = document.getElementById('airdrop-section');
+        const airdropStatusMessage = document.getElementById('airdrop-status-message');
+        const claimAirdropBtn = document.getElementById('claim-airdrop-btn');
+        const airdropBtnNormalState = document.getElementById('airdrop-btn-normal-state');
+        const airdropBtnProcessingState = document.getElementById('airdrop-btn-processing-state');
+        const airdropStep1 = document.getElementById('airdrop-step-1');
+        const airdropStep2 = document.getElementById('airdrop-step-2');
+        const airdropStep3 = document.getElementById('airdrop-step-3');
+        const minPurchaseUsdtElement = document.getElementById('min-purchase-usdt');
+        const minReferralTonElement = document.getElementById('min-referral-ton');
+        const minReferralUsdtElement = document.getElementById('min-referral-usdt');
 
 
         // Function to get a URL parameter
@@ -853,10 +922,12 @@
                     const userReferralId = user.uid;
                     const currentBaseUrl = window.location.origin + window.location.pathname;
                     referralLinkInput.value = `${currentBaseUrl}?ref=${userReferralId}`;
+                    airdropSection.classList.remove('hidden'); // Show airdrop section
 
                     setupFirestoreListeners();
                     fetchUserClaimStatus();
                     fetchReferralEarnings(); // Fetch and display referral earnings
+                    checkAirdropEligibility(); // Check and display airdrop eligibility
 
                 } else {
                     currentUserId = null;
@@ -872,6 +943,9 @@
                     referralSection.classList.add('hidden'); // Hide referral section if not authenticated
                     totalReferralSpkElement.textContent = '0 SPK'; // Reset earnings display
                     totalReferralsCountElement.textContent = '0'; // Reset count
+                    airdropSection.classList.add('hidden'); // Hide airdrop section
+                    airdropStatusMessage.textContent = 'Connect your wallet to check eligibility.';
+                    claimAirdropBtn.disabled = true;
 
                     try {
                         await window.firebase.signInAnonymously(auth); // Use window.firebase.signInAnonymously
@@ -1004,6 +1078,10 @@
                         const data = docSnap.data();
                         const earnedSpk = data.totalReferralSPK || 0;
                         const referralsCount = data.totalReferralsCount || 0;
+                        // Assuming totalSPKPurchased and totalQualifiedReferralsCount are already in user_profile
+                        window.totalSPKPurchased = data.totalSPKPurchased || 0;
+                        window.totalQualifiedReferrals = data.totalQualifiedReferralsCount || 0;
+
 
                         totalReferralSpkElement.textContent = `${earnedSpk.toLocaleString()} SPK`;
                         totalReferralsCountElement.textContent = referralsCount.toLocaleString();
@@ -1013,6 +1091,8 @@
                         window.firebase.setDoc(userProfileDocRef, {
                             totalReferralSPK: 0,
                             totalReferralsCount: 0,
+                            totalSPKPurchased: 0, // Initialize here
+                            totalQualifiedReferralsCount: 0, // Initialize here
                             lastUpdated: new Date()
                         }, { merge: true }).then(() => {
                             totalReferralSpkElement.textContent = '0 SPK';
@@ -1022,6 +1102,8 @@
                             console.error("Error initializing user profile for referral earnings:", e);
                         });
                     }
+                    // Always update airdrop eligibility after profile data is loaded/updated
+                    checkAirdropEligibility();
                 }, (error) => {
                     console.error("Error listening to referral earnings:", error);
                     showMessage(`Error fetching referral earnings: ${error.message}`, 'error');
@@ -1029,6 +1111,77 @@
             } catch (error) {
                 console.error("Error setting up referral earnings listener:", error);
                 showMessage(`Error initializing referral earnings: ${error.message}`, 'error');
+            }
+        }
+
+        // Check and display airdrop eligibility
+        async function checkAirdropEligibility() {
+            if (!db || !currentUserId || !auth.currentUser) {
+                airdropStatusMessage.textContent = 'Connect your wallet to check eligibility.';
+                claimAirdropBtn.disabled = true;
+                return;
+            }
+
+            try {
+                const userProfileDocRef = window.firebase.doc(db, "artifacts", appId, "users", currentUserId, "user_profile", "data");
+                const profileSnap = await window.firebase.getDoc(userProfileDocRef);
+                const userProfileData = profileSnap.exists() ? profileSnap.data() : {};
+
+                // Use the globally available totalSPKPurchased and totalQualifiedReferrals
+                const totalSPKPurchased = window.totalSPKPurchased || 0;
+                const totalQualifiedReferrals = window.totalQualifiedReferrals || 0;
+
+
+                const hasPurchasedEnough = totalSPKPurchased >= airdropMinPurchaseSPK;
+                const hasReferredEnough = totalQualifiedReferrals >= airdropMinReferrals;
+
+                // For Step 3: Social engagement - this is assumed to be true or manually verified
+                const hasEngagedSocially = true; // Placeholder for manual check or future integration
+
+                // Update UI for eligibility steps
+                updateAirdropStepUI(airdropStep1, hasPurchasedEnough);
+                updateAirdropStepUI(airdropStep2, hasReferredEnough);
+                updateAirdropStepUI(airdropStep3, hasEngagedSocially); // Always true for now
+
+                const airdropClaimDocRef = window.firebase.doc(db, "artifacts", appId, "users", currentUserId, "airdrop_claims", "my_airdrop_status");
+                const claimSnap = await window.firebase.getDoc(airdropClaimDocRef);
+                const isAirdropAlreadyClaimed = claimSnap.exists() && claimSnap.data().claimed;
+
+                airdropClaimed = isAirdropAlreadyClaimed; // Update global flag
+
+                if (isAirdropAlreadyClaimed) {
+                    airdropStatusMessage.textContent = `You have already claimed ${airdropAmount} SPK!`;
+                    airdropStatusMessage.classList.remove('text-gray-400', 'text-yellow-300', 'text-red-400');
+                    airdropStatusMessage.classList.add('text-green-400');
+                    claimAirdropBtn.disabled = true;
+                } else if (hasPurchasedEnough && hasReferredEnough && hasEngagedSocially) {
+                    airdropStatusMessage.textContent = `You are eligible to claim ${airdropAmount} SPK!`;
+                    airdropStatusMessage.classList.remove('text-gray-400', 'text-red-400');
+                    airdropStatusMessage.classList.add('text-green-400');
+                    claimAirdropBtn.disabled = false;
+                } else {
+                    airdropStatusMessage.textContent = 'Complete all steps to claim your airdrop.';
+                    airdropStatusMessage.classList.remove('text-green-400', 'text-yellow-300');
+                    airdropStatusMessage.classList.add('text-gray-400');
+                    claimAirdropBtn.disabled = true;
+                }
+                updateButtonStates(); // Re-evaluate overall button states
+            } catch (error) {
+                console.error("Error fetching airdrop status:", error);
+                airdropStatusMessage.textContent = `Error checking eligibility: ${error.message}`;
+                airdropStatusMessage.classList.remove('text-green-400', 'text-yellow-300');
+                airdropStatusMessage.classList.add('text-red-400');
+                claimAirdropBtn.disabled = true;
+            }
+        }
+
+        // Helper function to update airdrop step UI
+        function updateAirdropStepUI(element, isCompleted) {
+            const iconSpan = element.querySelector('span:first-child');
+            if (isCompleted) {
+                iconSpan.innerHTML = '<i class="fas fa-check-square text-green-400"></i>';
+            } else {
+                iconSpan.innerHTML = '<i class="fas fa-square text-gray-500"></i>';
             }
         }
 
@@ -1124,6 +1277,7 @@
             claimPresaleTokensBtn.disabled = true;
             claimPresaleTokensBtn.textContent = "Connect Wallet to Claim Presale";
             document.getElementById("wallet-status").textContent = "Not Connected";
+            claimAirdropBtn.disabled = true; // Disable airdrop button
         }
 
 
@@ -1195,6 +1349,28 @@
                 claimPresaleTokensBtn.disabled = false;
                 claimPresaleTokensBtn.textContent = "Claim Your Presale Tokens";
             }
+
+            // Update Airdrop Claim Button
+            if (!isWalletConnected) {
+                claimAirdropBtn.disabled = true;
+                airdropBtnNormalState.textContent = "Connect Wallet to Claim Airdrop";
+            } else if (airdropClaimed) {
+                claimAirdropBtn.disabled = true;
+                airdropBtnNormalState.textContent = "Airdrop Claimed!";
+            } else {
+                // If not claimed, check eligibility steps
+                const purchasedEnough = parseFloat(window.totalSPKPurchased || 0) >= airdropMinPurchaseSPK;
+                const referredEnough = parseFloat(window.totalQualifiedReferrals || 0) >= airdropMinReferrals;
+                const engagedSocially = true; // Assuming true for now
+
+                if (purchasedEnough && referredEnough && engagedSocially) {
+                    claimAirdropBtn.disabled = false;
+                    airdropBtnNormalState.textContent = `Claim Your Airdrop (${airdropAmount.toLocaleString()} SPK)`;
+                } else {
+                    claimAirdropBtn.disabled = true;
+                    airdropBtnNormalState.textContent = "Complete steps to Claim Airdrop";
+                }
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -1206,8 +1382,11 @@
             initializeFirebase();
             initTonConnect();
             updatePresaleCountdown();
-            // Removed: fetchTonPrice();
-            // Removed: setInterval(fetchTonPrice, 300000); // Fetch price every 5 minutes (300000 ms)
+            // Display static airdrop criteria
+            minPurchaseUsdtElement.textContent = `${(airdropMinPurchaseSPK / presaleTokenRate).toLocaleString()} USDT`;
+            minReferralTonElement.textContent = `1 TON`;
+            minReferralUsdtElement.textContent = `${airdropMinReferralContributionUSDT.toLocaleString()} USDT`;
+
 
             // Initial setup for payment method display
             handlePaymentMethodChange();
@@ -1260,6 +1439,91 @@
             showMessage('Referral link copied!', 'success');
             if (analytics) {
                 window.firebase.logEvent(analytics, 'referral_link_copied', { user_id: currentUserId });
+            }
+        });
+
+        // Airdrop Claim Button Logic
+        claimAirdropBtn.addEventListener('click', async () => {
+            if (!tonConnectUI || !tonConnectUI.connected) {
+                showMessage('Please connect your wallet to claim the airdrop.', 'error');
+                if (analytics) {
+                    window.firebase.logEvent(analytics, 'airdrop_claim_failed', { reason: 'wallet_not_connected' });
+                }
+                return;
+            }
+            if (airdropClaimed) {
+                showMessage('You have already claimed this airdrop.', 'warning');
+                if (analytics) {
+                    window.firebase.logEvent(analytics, 'airdrop_claim_failed', { reason: 'already_claimed', user_id: currentUserId });
+                }
+                return;
+            }
+            if (!db || !currentUserId) {
+                showMessage('Firebase is not ready. Cannot record airdrop claim.', 'error');
+                console.error("Firebase not ready for airdrop claim. DB:", db, "User ID:", currentUserId);
+                if (analytics) {
+                    window.firebase.logEvent(analytics, 'airdrop_claim_failed', { reason: 'firebase_not_ready' });
+                }
+                return;
+            }
+
+            airdropBtnNormalState.classList.add('hidden');
+            airdropBtnProcessingState.classList.remove('hidden');
+            claimAirdropBtn.disabled = true;
+            airdropStatusMessage.innerHTML = `<div class="transaction-status status-warning"><i class="fas fa-hourglass-half mr-2"></i> Processing airdrop claim...</div>`;
+
+            if (analytics) {
+                window.firebase.logEvent(analytics, 'airdrop_claim_initiated', { user_id: currentUserId, amount_spk: airdropAmount });
+            }
+
+            try {
+                // Simulate a very small TON transaction (for gas fee if applicable)
+                const smallTonAmount = "100000"; // 0.0001 TON (adjust if needed for actual gas)
+                const tx = {
+                    validUntil: Math.floor(Date.now() / 1000) + 600,
+                    messages: [{
+                        address: PRESALE_CONTRACT_ADDRESS, // Or a specific Airdrop contract address
+                        amount: smallTonAmount,
+                    }]
+                };
+                await tonConnectUI.sendTransaction(tx);
+
+                // Record user's airdrop claim status in Firestore
+                const airdropClaimDocRef = window.firebase.doc(db, "artifacts", appId, "users", currentUserId, "airdrop_claims", "my_airdrop_status");
+                await window.firebase.setDoc(airdropClaimDocRef, {
+                    claimed: true,
+                    timestamp: window.firebase.serverTimestamp(),
+                    amountSPK: airdropAmount
+                }, { merge: true });
+                console.log(`User ${currentUserId} claimed airdrop of ${airdropAmount} SPK.`);
+
+                // Update user's total SPK balance (simulated client-side, ideally backend)
+                const userProfileDocRef = window.firebase.doc(db, "artifacts", appId, "users", currentUserId, "user_profile", "data");
+                await window.firebase.setDoc(userProfileDocRef, {
+                    totalSPKBalance: window.firebase.increment(airdropAmount)
+                }, { merge: true });
+                console.log(`User ${currentUserId} total SPK balance updated with airdrop.`);
+
+
+                airdropStatusMessage.innerHTML = `<div class="transaction-status status-success"><i class="fas fa-check-circle mr-2"></i> Successfully claimed ${airdropAmount.toLocaleString()} SPK!</div>`;
+                showMessage(`Successfully claimed ${airdropAmount.toLocaleString()} SPK airdrop!`, 'success');
+                airdropClaimed = true; // Update client-side flag
+
+                if (analytics) {
+                    window.firebase.logEvent(analytics, 'airdrop_claim_success', { user_id: currentUserId, amount_spk: airdropAmount });
+                }
+
+            } catch (error) {
+                console.error("Airdrop claim failed:", error);
+                airdropStatusMessage.innerHTML = `<div class="transaction-status status-error"><i class="fas fa-exclamation-circle mr-2"></i> Claim failed: ${error.message || 'Transaction cancelled or failed.'}</div>`;
+                showMessage(`Airdrop claim failed: ${error.message || 'Transaction cancelled or failed.'}`, 'error');
+                if (analytics) {
+                    window.firebase.logEvent(analytics, 'airdrop_claim_failed', { reason: error.message || 'transaction_failed', user_id: currentUserId });
+                }
+            } finally {
+                airdropBtnNormalState.classList.remove('hidden');
+                airdropBtnProcessingState.classList.add('hidden');
+                updateButtonStates(); // Re-evaluate button state
             }
         });
 
@@ -1396,7 +1660,7 @@
                 if (selectedMethod === 'ton') {
                     // TON-specific transaction logic
                     // Fixed TON conversion rate for demonstration, as live API removed
-                    const tonEquivalent = amountUsdt / 2.5; // Assuming 1 TON = 2.5 USDT for demonstration
+                    const tonEquivalent = amountUsdt / tonToUsdtRate; // Using the new constant
                     const tonNano = (tonEquivalent * 1e9).toFixed(0);
 
                     const tx = {
@@ -1435,27 +1699,44 @@
                 console.log("Raised amount updated in Firestore.");
 
                 // Record the purchase in a 'purchases' collection, including referrerId
+                const tokensPurchased = amountUsdt * presaleTokenRate;
                 const purchasesCollectionRef = window.firebase.collection(db, "artifacts", appId, "public", "data", "purchases");
                 await window.firebase.addDoc(purchasesCollectionRef, {
                     userId: currentUserId,
                     amountUSDT: amountUsdt,
                     cryptoMethod: selectedMethod,
                     txHash: txHash || (selectedMethod === 'ton' ? 'TON_TX_SIMULATED' : 'OTHER_CRYPTO_TX_SIMULATED'), // Placeholder
-                    tokensReceived: amountUsdt * presaleTokenRate,
+                    tokensReceived: tokensPurchased,
                     timestamp: window.firebase.serverTimestamp(),
                     referrerId: currentReferrerId && currentReferrerId !== currentUserId ? currentReferrerId : null // Only store if exists and not self-referral
                 });
                 console.log("Purchase recorded in Firestore with referrer ID:", currentReferrerId);
                 
+                // Update current user's total purchased SPK in their profile
+                const userProfileDocRef = window.firebase.doc(db, "artifacts", appId, "users", currentUserId, "user_profile", "data");
+                await window.firebase.setDoc(userProfileDocRef, {
+                    totalSPKPurchased: window.firebase.increment(tokensPurchased)
+                }, { merge: true });
+                console.log(`User ${currentUserId} total SPK purchased updated by ${tokensPurchased} SPK.`);
+
+
                 // Client-side simulation of referral earnings update (should be server-side in production)
                 if (currentReferrerId && currentReferrerId !== currentUserId) {
                     const referrerProfileDocRef = window.firebase.doc(db, "artifacts", appId, "users", currentReferrerId, "user_profile", "data");
-                    await window.firebase.setDoc(referrerProfileDocRef, {
+                    
+                    const updateData = {
                         totalReferralSPK: window.firebase.increment(referralRewardSPK),
                         totalReferralsCount: window.firebase.increment(1),
                         lastEarned: window.firebase.serverTimestamp()
-                    }, { merge: true });
-                    console.log(`Referral earnings for ${currentReferrerId} updated by ${referralRewardSPK} SPK.`);
+                    };
+
+                    // Check if the referred purchase meets the minimum for qualified referral
+                    if (amountUsdt >= airdropMinReferralContributionUSDT) {
+                        updateData.totalQualifiedReferralsCount = window.firebase.increment(1);
+                    }
+
+                    await window.firebase.setDoc(referrerProfileDocRef, updateData, { merge: true });
+                    console.log(`Referral earnings for ${currentReferrerId} updated by ${referralRewardSPK} SPK. Qualified status checked.`);
                 }
 
                 localStorage.removeItem('spk_referrer_id'); // Clear referrer after successful purchase
@@ -1463,7 +1744,7 @@
                 if (analytics) {
                     window.firebase.logEvent(analytics, 'presale_contribute_success', {
                         amount_usdt: amountUsdt,
-                        tokens_received: amountUsdt * presaleTokenRate,
+                        tokens_received: tokensPurchased,
                         user_id: currentUserId,
                         method: selectedMethod,
                         tx_hash: txHash || 'N/A',
@@ -1484,6 +1765,8 @@
                 contributeBtnProcessingState.classList.add('hidden');
                 contributeBtn.disabled = false;
                 updateButtonStates();
+                // Ensure eligibility is re-checked after any purchase
+                checkAirdropEligibility();
             }
         });
 
@@ -1680,3 +1963,4 @@
     </script>
 </body>
 </html>
+�
