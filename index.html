@@ -386,7 +386,7 @@
                 <li><a href="#airdrop-section" class="hover:text-purple-400 transition-colors duration-300">Airdrop</a></li>
                 <li><a href="#tokenomics" class="hover:text-purple-400 transition-colors duration-300">Tokenomics</a></li>
                 <li><a href="#roadmap" class="hover:text-purple-400 transition-colors duration-300">Roadmap</a></li>
-                <li><a href="https://docs.yourproject.com" target="_blank" rel="noopener noreferrer" class="hover:text-purple-400 transition-colors duration-300">Docs</a></li>
+                <li><a href="whitepaper.html" class="hover:text-purple-400 transition-colors duration-300">Whitepaper</a></li>
             </ul>
         </div>
         <div id="ton-connect-button-wrapper">
@@ -549,11 +549,24 @@
                         <br><small class="text-gray-400">Join our <a href="https://t.me/+pfQZh-Qznfk4Yzdh" target="_blank" class="text-blue-400 hover:underline">Telegram</a>, follow us on <a href="https://x.com/splufictoken" target="_blank" class="text-blue-400 hover:underline">X (Twitter)</a>, like, comment & share the launch post.</small>
                     </span>
                 </li>
+                <li id="airdrop-step-4" class="flex items-center">
+                    <span class="text-gray-500 mr-3"><i class="fas fa-square"></i></span>
+                    <span>
+                        <span class="font-bold">4. Get Verified by TON Team</span>
+                        <br><small class="text-gray-400">Click the button below to simulate verification.</small>
+                    </span>
+                </li>
             </ul>
 
             <p class="text-md text-gray-300 mb-6 font-semibold">
-                � Airdrop Distribution: Airdrops will be claimable after presale ends (June 16, 2026). Verified wallets will be eligible to claim directly from the site.
+                📅 Airdrop Distribution: Airdrops will be claimable after presale ends (June 16, 2026). Verified wallets will be eligible to claim directly from the site.
             </p>
+
+            <button id="simulate-ton-verification-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full text-lg shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-75 mt-4">
+                <i class="fas fa-user-check mr-2"></i> Simulate TON Verification
+            </button>
+            <div id="ton-verification-status" class="mt-4 text-sm text-center text-gray-400"></div>
+
 
             <div id="airdrop-status-message" class="mb-6 text-xl text-gray-400">
                 Connect your wallet to check eligibility.
@@ -727,7 +740,7 @@
 
         // --- TON Connect Configuration ---
         const tonConnectConfig = {
-            manifestUrl: "https://spk-presale-git-main-captsplufiks-projects.vercel.app/tonconnect-manifest.json",
+            manifestUrl: "https://spk-presale-git-main-captsplufiks-projects.vercel.app/tonconnect-manifest.json", // Re-added manifestUrl
             buttonRootId: "ton-connect",
             chain: 'mainnet',
         };
@@ -822,6 +835,12 @@
         const airdropStep1 = document.getElementById('airdrop-step-1');
         const airdropStep2 = document.getElementById('airdrop-step-2');
         const airdropStep3 = document.getElementById('airdrop-step-3');
+        // New Airdrop Step 4 elements
+        const airdropStep4 = document.getElementById('airdrop-step-4');
+        const simulateTonVerificationBtn = document.getElementById('simulate-ton-verification-btn');
+        const tonVerificationStatus = document.getElementById('ton-verification-status');
+        let isTonVerified = false; // New state variable for TON verification
+
         const minPurchaseUsdtElement = document.getElementById('min-purchase-usdt');
         const minReferralTonElement = document.getElementById('min-referral-ton');
         const minReferralUsdtElement = document.getElementById('min-referral-usdt');
@@ -946,6 +965,8 @@
                     airdropSection.classList.add('hidden'); // Hide airdrop section
                     airdropStatusMessage.textContent = 'Connect your wallet to check eligibility.';
                     claimAirdropBtn.disabled = true;
+                    isTonVerified = false; // Reset TON verification status
+                    tonVerificationStatus.textContent = ''; // Clear verification status message
 
                     try {
                         await window.firebase.signInAnonymously(auth); // Use window.firebase.signInAnonymously
@@ -1063,7 +1084,7 @@
             }
         }
 
-        // Fetch and display current user's referral earnings
+        // Fetch and display current user's referral earnings and other profile data
         async function fetchReferralEarnings() {
             if (!db || !currentUserId) {
                 console.warn("Firestore or User ID not ready, cannot fetch referral earnings.");
@@ -1078,25 +1099,40 @@
                         const data = docSnap.data();
                         const earnedSpk = data.totalReferralSPK || 0;
                         const referralsCount = data.totalReferralsCount || 0;
-                        // Assuming totalSPKPurchased and totalQualifiedReferralsCount are already in user_profile
                         window.totalSPKPurchased = data.totalSPKPurchased || 0;
                         window.totalQualifiedReferrals = data.totalQualifiedReferralsCount || 0;
-
+                        isTonVerified = data.isTonVerified || false; // Fetch TON verification status
 
                         totalReferralSpkElement.textContent = `${earnedSpk.toLocaleString()} SPK`;
                         totalReferralsCountElement.textContent = referralsCount.toLocaleString();
                         console.log(`Referral earnings for ${currentUserId}: ${earnedSpk} SPK from ${referralsCount} referrals.`);
+                        
+                        // Update TON verification UI based on fetched status
+                        if (isTonVerified) {
+                            tonVerificationStatus.innerHTML = '<span class="text-green-400"><i class="fas fa-check-circle mr-2"></i> Verified by TON Team!</span>';
+                            simulateTonVerificationBtn.disabled = true;
+                            simulateTonVerificationBtn.textContent = 'Already Verified';
+                        } else {
+                            tonVerificationStatus.innerHTML = '<span class="text-yellow-400"><i class="fas fa-exclamation-triangle mr-2"></i> Not yet verified.</span>';
+                            simulateTonVerificationBtn.disabled = false;
+                            simulateTonVerificationBtn.textContent = 'Simulate TON Verification';
+                        }
+
                     } else {
                         // Initialize user profile if it doesn't exist
                         window.firebase.setDoc(userProfileDocRef, {
                             totalReferralSPK: 0,
                             totalReferralsCount: 0,
-                            totalSPKPurchased: 0, // Initialize here
-                            totalQualifiedReferralsCount: 0, // Initialize here
+                            totalSPKPurchased: 0,
+                            totalQualifiedReferralsCount: 0,
+                            isTonVerified: false, // Initialize as false
                             lastUpdated: new Date()
                         }, { merge: true }).then(() => {
                             totalReferralSpkElement.textContent = '0 SPK';
                             totalReferralsCountElement.textContent = '0';
+                            tonVerificationStatus.innerHTML = '<span class="text-yellow-400"><i class="fas fa-exclamation-triangle mr-2"></i> Not yet verified.</span>';
+                            simulateTonVerificationBtn.disabled = false;
+                            simulateTonVerificationBtn.textContent = 'Simulate TON Verification';
                             console.log("User profile for referral earnings initialized.");
                         }).catch(e => {
                             console.error("Error initializing user profile for referral earnings:", e);
@@ -1123,25 +1159,18 @@
             }
 
             try {
-                const userProfileDocRef = window.firebase.doc(db, "artifacts", appId, "users", currentUserId, "user_profile", "data");
-                const profileSnap = await window.firebase.getDoc(userProfileDocRef);
-                const userProfileData = profileSnap.exists() ? profileSnap.data() : {};
-
-                // Use the globally available totalSPKPurchased and totalQualifiedReferrals
-                const totalSPKPurchased = window.totalSPKPurchased || 0;
-                const totalQualifiedReferrals = window.totalQualifiedReferrals || 0;
-
-
-                const hasPurchasedEnough = totalSPKPurchased >= airdropMinPurchaseSPK;
-                const hasReferredEnough = totalQualifiedReferrals >= airdropMinReferrals;
-
-                // For Step 3: Social engagement - this is assumed to be true or manually verified
+                // Ensure profile data is up-to-date (it's fetched by onSnapshot in fetchReferralEarnings)
+                // Use the globally available totalSPKPurchased, totalQualifiedReferrals, and isTonVerified
+                const hasPurchasedEnough = window.totalSPKPurchased >= airdropMinPurchaseSPK;
+                const hasReferredEnough = window.totalQualifiedReferrals >= airdropMinReferrals;
                 const hasEngagedSocially = true; // Placeholder for manual check or future integration
+                const hasTonVerification = isTonVerified; // Use the fetched status
 
                 // Update UI for eligibility steps
                 updateAirdropStepUI(airdropStep1, hasPurchasedEnough);
                 updateAirdropStepUI(airdropStep2, hasReferredEnough);
                 updateAirdropStepUI(airdropStep3, hasEngagedSocially); // Always true for now
+                updateAirdropStepUI(airdropStep4, hasTonVerification); // Update for TON verification
 
                 const airdropClaimDocRef = window.firebase.doc(db, "artifacts", appId, "users", currentUserId, "airdrop_claims", "my_airdrop_status");
                 const claimSnap = await window.firebase.getDoc(airdropClaimDocRef);
@@ -1150,12 +1179,12 @@
                 airdropClaimed = isAirdropAlreadyClaimed; // Update global flag
 
                 if (isAirdropAlreadyClaimed) {
-                    airdropStatusMessage.textContent = `You have already claimed ${airdropAmount} SPK!`;
+                    airdropStatusMessage.textContent = `You have already claimed ${airdropAmount.toLocaleString()} SPK!`;
                     airdropStatusMessage.classList.remove('text-gray-400', 'text-yellow-300', 'text-red-400');
                     airdropStatusMessage.classList.add('text-green-400');
                     claimAirdropBtn.disabled = true;
-                } else if (hasPurchasedEnough && hasReferredEnough && hasEngagedSocially) {
-                    airdropStatusMessage.textContent = `You are eligible to claim ${airdropAmount} SPK!`;
+                } else if (hasPurchasedEnough && hasReferredEnough && hasEngagedSocially && hasTonVerification) {
+                    airdropStatusMessage.textContent = `You are eligible to claim ${airdropAmount.toLocaleString()} SPK!`;
                     airdropStatusMessage.classList.remove('text-gray-400', 'text-red-400');
                     airdropStatusMessage.classList.add('text-green-400');
                     claimAirdropBtn.disabled = false;
@@ -1190,8 +1219,8 @@
         async function initTonConnect() {
             try {
                 tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-                    manifestUrl: tonConnectConfig.manifestUrl,
-                    buttonRootId: tonConnectConfig.buttonRootId,
+                    manifestUrl: "https://spk-presale-git-main-captsplufiks-projects.vercel.app/tonconnect-manifest.json", // Re-added manifestUrl to fix the error
+                    buttonRootId: "ton-connect",
                     language: 'en',
                     uiPreferences: {
                         theme: 'DARK',
@@ -1278,6 +1307,7 @@
             claimPresaleTokensBtn.textContent = "Connect Wallet to Claim Presale";
             document.getElementById("wallet-status").textContent = "Not Connected";
             claimAirdropBtn.disabled = true; // Disable airdrop button
+            simulateTonVerificationBtn.disabled = true; // Disable verification button
         }
 
 
@@ -1331,7 +1361,7 @@
                 }
                 else {
                     contributeBtn.disabled = false;
-                    contributeBtnNormalState.textContent = `Confirm Payment (via ${selectedMethod.toUpperCase().replace('_', ' ')})`;
+                    contributeBtnNormalState.textContent = `Confirm Payment (via ${selectedMethod.toUpperCase().replace('_', ' ')}`;
                 }
             }
 
@@ -1362,14 +1392,27 @@
                 const purchasedEnough = parseFloat(window.totalSPKPurchased || 0) >= airdropMinPurchaseSPK;
                 const referredEnough = parseFloat(window.totalQualifiedReferrals || 0) >= airdropMinReferrals;
                 const engagedSocially = true; // Assuming true for now
+                const tonVerified = isTonVerified;
 
-                if (purchasedEnough && referredEnough && engagedSocially) {
+                if (purchasedEnough && referredEnough && engagedSocially && tonVerified) {
                     claimAirdropBtn.disabled = false;
                     airdropBtnNormalState.textContent = `Claim Your Airdrop (${airdropAmount.toLocaleString()} SPK)`;
                 } else {
                     claimAirdropBtn.disabled = true;
                     airdropBtnNormalState.textContent = "Complete steps to Claim Airdrop";
                 }
+            }
+
+            // Update Simulate TON Verification Button
+            if (!isWalletConnected) {
+                simulateTonVerificationBtn.disabled = true;
+                simulateTonVerificationBtn.textContent = 'Connect Wallet to Verify';
+            } else if (isTonVerified) {
+                simulateTonVerificationBtn.disabled = true;
+                simulateTonVerificationBtn.textContent = 'Already Verified';
+            } else {
+                simulateTonVerificationBtn.disabled = false;
+                simulateTonVerificationBtn.textContent = 'Simulate TON Verification';
             }
         }
 
@@ -1390,6 +1433,12 @@
 
             // Initial setup for payment method display
             handlePaymentMethodChange();
+
+            // Scroll to the presale section on page load
+            const presaleSection = document.getElementById('presale-section');
+            if (presaleSection) {
+                presaleSection.scrollIntoView({ behavior: 'smooth' });
+            }
         });
 
 
@@ -1441,6 +1490,52 @@
                 window.firebase.logEvent(analytics, 'referral_link_copied', { user_id: currentUserId });
             }
         });
+
+        // Simulate TON Verification Button Logic
+        simulateTonVerificationBtn.addEventListener('click', async () => {
+            if (!currentUserId) {
+                showMessage('Please connect your wallet first to simulate TON verification.', 'error');
+                return;
+            }
+            if (isTonVerified) {
+                showMessage('You are already verified by the TON Team.', 'warning');
+                return;
+            }
+
+            tonVerificationStatus.innerHTML = `<span class="text-yellow-400"><i class="fas fa-hourglass-half mr-2"></i> Simulating verification...</span>`;
+            simulateTonVerificationBtn.disabled = true;
+
+            try {
+                // Simulate an API call or backend process for verification
+                await new Promise(resolve => setTimeout(2000, resolve)); // Simulate 2-second delay
+
+                const userProfileDocRef = window.firebase.doc(db, "artifacts", appId, "users", currentUserId, "user_profile", "data");
+                await window.firebase.setDoc(userProfileDocRef, {
+                    isTonVerified: true,
+                    verificationTimestamp: window.firebase.serverTimestamp()
+                }, { merge: true });
+
+                isTonVerified = true; // Update local state
+                tonVerificationStatus.innerHTML = '<span class="text-green-400"><i class="fas fa-check-circle mr-2"></i> Successfully verified by TON Team!</span>';
+                showMessage('TON Team verification successful!', 'success');
+
+                if (analytics) {
+                    window.firebase.logEvent(analytics, 'ton_verification_success', { user_id: currentUserId });
+                }
+
+            } catch (error) {
+                console.error("TON verification simulation failed:", error);
+                tonVerificationStatus.innerHTML = `<span class="text-red-400"><i class="fas fa-exclamation-circle mr-2"></i> Verification failed: ${error.message || 'Please try again.'}</span>`;
+                showMessage(`TON verification failed: ${error.message || 'Please try again.'}`, 'error');
+                if (analytics) {
+                    window.firebase.logEvent(analytics, 'ton_verification_failed', { error_message: error.message, user_id: currentUserId });
+                }
+            } finally {
+                updateButtonStates(); // Re-evaluate button states and eligibility
+                checkAirdropEligibility(); // Re-check airdrop eligibility
+            }
+        });
+
 
         // Airdrop Claim Button Logic
         claimAirdropBtn.addEventListener('click', async () => {
@@ -1963,4 +2058,3 @@
     </script>
 </body>
 </html>
-�
